@@ -2,11 +2,12 @@ import numpy as np
 
 class SchwingerDyson:
 
-    def __init__(self, beta, q, J, discretization, steps=1000):
+    def __init__(self, beta, q, J, m, discretization, steps=1000):
 
         self.q = q
         self.beta = beta
         self.J = J
+        self.m = m
         self.discretization = discretization
         self.steps = steps
 
@@ -14,6 +15,16 @@ class SchwingerDyson:
         self.G33d = np.zeros((2*discretization, 2*discretization))
         self.Ghatn = np.zeros((4*discretization, 4*discretization))
         self.Ghatd = np.zeros((4*discretization, 4*discretization))
+
+        self.G33n_old = np.zeros((2*discretization, 2*discretization))
+        self.G33d_old = np.zeros((2*discretization, 2*discretization))
+        self.Ghatn_old = np.zeros((4*discretization, 4*discretization))
+        self.Ghatd_old = np.zeros((4*discretization, 4*discretization))
+
+        self.Sigmahatn = np.zeros((4*discretization, 4*discretization))
+        self.Sigmahatd = np.zeros((4*discretization, 4*discretization))
+        self.Sigma33n = np.zeros((2*discretization, 2*discretization))
+        self.Sigma33d = np.zeros((2*discretization, 2*discretization))
 
         self.init_matrices()
 
@@ -41,8 +52,19 @@ class SchwingerDyson:
                 else:
                     self.Ghatd[i,j] = 0
 
+    #Calculate Gijs from Ghat, use second S.-D. equation to calculate Sigma_ijs and then calculate Sigma_hat
+    def get_Sigma(self):
 
+        return
+    
+    #use first S.-D. equation to calculate Ghat and G33
+    def get_G(self):
+
+        return
+
+    #iteratively solve the Schinger-Dyson equations
     def solve(self):
 
         return
+        
 
