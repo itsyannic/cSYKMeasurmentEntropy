@@ -10,10 +10,10 @@ class SchwingerDyson:
         self.discretization = discretization
         self.steps = steps
 
-        self.G33n = np.array((2*discretization, 2*discretization))
-        self.G33d = np.array((2*discretization, 2*discretization))
-        self.Ghatn = np.array((4*discretization, 4*discretization))
-        self.Ghatd = np.array((4*discretization, 4*discretization))
+        self.G33n = np.zeros((2*discretization, 2*discretization))
+        self.G33d = np.zeros((2*discretization, 2*discretization))
+        self.Ghatn = np.zeros((4*discretization, 4*discretization))
+        self.Ghatd = np.zeros((4*discretization, 4*discretization))
 
         self.init_matrices()
 
