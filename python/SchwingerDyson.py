@@ -11,20 +11,20 @@ class SchwingerDyson:
         self.discretization = discretization
         self.steps = steps
 
-        self.G33n = np.zeros((2*discretization, 2*discretization))
-        self.G33d = np.zeros((2*discretization, 2*discretization))
-        self.Ghatn = np.zeros((4*discretization, 4*discretization))
-        self.Ghatd = np.zeros((4*discretization, 4*discretization))
+        self.G33n = np.zeros((2*discretization, 2*discretization), dtype=np.double)
+        self.G33d = np.zeros((2*discretization, 2*discretization), dtype=np.double)
+        self.Ghatn = np.zeros((4*discretization, 4*discretization), dtype=np.double)
+        self.Ghatd = np.zeros((4*discretization, 4*discretization), dtype=np.double)
 
-        self.G33n_old = np.zeros((2*discretization, 2*discretization))
-        self.G33d_old = np.zeros((2*discretization, 2*discretization))
-        self.Ghatn_old = np.zeros((4*discretization, 4*discretization))
-        self.Ghatd_old = np.zeros((4*discretization, 4*discretization))
+        self.G33n_old = np.zeros((2*discretization, 2*discretization), dtype=np.double)
+        self.G33d_old = np.zeros((2*discretization, 2*discretization), dtype=np.double)
+        self.Ghatn_old = np.zeros((4*discretization, 4*discretization), dtype=np.double)
+        self.Ghatd_old = np.zeros((4*discretization, 4*discretization), dtype=np.double)
 
-        self.Sigmahatn = np.zeros((4*discretization, 4*discretization))
-        self.Sigmahatd = np.zeros((4*discretization, 4*discretization))
-        self.Sigma33n = np.zeros((2*discretization, 2*discretization))
-        self.Sigma33d = np.zeros((2*discretization, 2*discretization))
+        self.Sigmahatn = np.zeros((4*discretization, 4*discretization), dtype=np.double)
+        self.Sigmahatd = np.zeros((4*discretization, 4*discretization), dtype=np.double)
+        self.Sigma33n = np.zeros((2*discretization, 2*discretization), dtype=np.double)
+        self.Sigma33d = np.zeros((2*discretization, 2*discretization), dtype=np.double)
 
         self.init_matrices()
 
