@@ -50,7 +50,7 @@ def convert_map_to_matrix(map, matrix, step):
     matrices = []
 
     for i in range(len(map)-1):
-        inner_matrix = []
+        row = []
         for j in range(len(map[i])):
             x,y,c = map[i][j]
             new_matrix = c*np.array([matrix[step*x+k][step*y:step*(y+1)] for k in range(step)])
@@ -63,7 +63,7 @@ def convert_map_to_matrix(map, matrix, step):
                 new_matrix = np.flip(new_matrix,axis=0)
 
             #put blocks into 2 by 2 form
-            inner_matrix.append(new_matrix)
-        matrices.append(inner_matrix)
+            row.append(new_matrix)
+        matrices.append(row)
 
     return np.block(matrices)
