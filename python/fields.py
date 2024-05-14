@@ -53,7 +53,7 @@ def convert_map_to_matrix(map, matrix, step):
         inner_matrix = []
         for j in range(len(map[i])):
             x,y,c = map[i][j]
-            new_matrix = c*np.array([matrix[x+k][y:y+step] for k in range(step)])
+            new_matrix = c*np.array([matrix[step*x+k][step*y:step*(y+1)] for k in range(step)])
 
             #do any necessary flips
             ax = map[-1]
