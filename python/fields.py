@@ -44,6 +44,17 @@ test = -1/2*np.array([
     [1181, 1182, 1282, 1281, -1284, -1283, 1183, 1184, 1185, 1186, 1286, 1285, -1288, -1287, 1187, 1188],
     ])
 
+Sigma = [
+    [(11, -1, [0,0]), (21, -1, [0,1]), (21, 1, [0,1]), (11, -1, [0,0]), (11, -1, [0,0]), (21, -1, [0,1]), (21, 1, [0,1]), (11, -1, [0,0])],
+    [(12, -1, [1,0]), (22, -1,[1,1]), (22, 1, [1,1]), (12, -1, [1,0]), (12, -1, [1,0]), (22, -1, [1,1]), (22, 1, [1,1]), (12, -1, [1,0])],
+    [(12, 1, [1,0]), (22, 1,[1,1]), (22, -1, [1,1]), (12, 1, [1,0]), (12, 1, [1,0]), (22, 1, [1,1]), (22, -1, [1,1]), (12, 1, [1,0])],
+    [(11, -1, [0,0]), (21, -1, [0,1]), (21, 1, [0,1]), (11, -1, [0,0]), (11, -1, [0,0]), (21, -1, [0,1]), (21, 1, [0,1]), (11, -1, [0,0])],
+    [(11, -1, [0,0]), (21, -1, [0,1]), (21, 1, [0,1]), (11, -1, [0,0]), (11, -1, [0,0]), (21, -1, [0,1]), (21, 1, [0,1]), (11, -1, [0,0])],
+    [(12, -1, [1,0]), (22, -1,[1,1]), (22, 1, [1,1]), (12, -1, [1,0]), (12, -1, [1,0]), (22, -1, [1,1]), (22, 1, [1,1]), (12, -1, [1,0])],
+    [(12, 1, [1,0]), (22, 1,[1,1]), (22, -1, [1,1]), (12, 1, [1,0]), (12, 1, [1,0]), (22, 1, [1,1]), (22, -1, [1,1]), (12, 1, [1,0])],
+    [(11, -1, [0,0]), (21, -1, [0,1]), (21, 1, [0,1]), (11, -1, [0,0]), (11, -1, [0,0]), (21, -1, [0,1]), (21, 1, [0,1]), (11, -1, [0,0])]
+]
+
 #use maps to convert Ghat into G11, G22, etc.
 def convert_map_to_matrix(map, matrix, step):
 
@@ -67,3 +78,41 @@ def convert_map_to_matrix(map, matrix, step):
         matrices.append(row)
 
     return np.block(matrices)
+
+def convert_matrices_to_map(Sigma11, Sigma22, Sigma12, Sigma21, map, step):
+
+    matrix = []
+
+    for i in range(len(map)):
+        row = []
+        for j in range(len(map[i])):
+            
+            index, factor, ax = map[i][j]
+            Sigma = []
+
+            if (index == 11):
+                Sigma = Sigma11
+            elif (index == 22):
+                Sigma = Sigma22
+            elif (index == 12):
+                Sigma = Sigma12
+            elif (index == 21):
+                Sigma = Sigma21
+            else:
+                print("error: wrong index\n")
+            
+            new_matrix = factor*np.array([Sigma[step*i + k][step*j:step(j+1)] for k in range(step)])
+
+            #do any necessary flips
+            ax = map[-1]
+            if (ax[1]):
+                new_matrix = np.flip(new_matrix,axis=1)
+            if (ax[0]):
+                new_matrix = np.flip(new_matrix,axis=0)
+
+            #put blocks into 2 by 2 form
+            row.append(new_matrix)
+        
+        matrix.append(row)
+
+    return np.block(matrix)
