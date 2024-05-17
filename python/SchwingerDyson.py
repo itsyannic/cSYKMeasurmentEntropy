@@ -76,6 +76,7 @@ class SchwingerDyson:
         Sigma_d_dict = {'G11': Sigma_d11, 'G22': -Sigma_d11, 'G12': -Sigma_d11, 'G21': Sigma_d11}
         Sigma_n_dict = {'G11': Sigma_n11, 'G22': -Sigma_n11, 'G12': -Sigma_n11, 'G21': Sigma_n11}
 
+        #update Sigma matrices
         self.Sigma33d = -Sigma_d11
         self.Sigma33n = -Sigma_n11
 
