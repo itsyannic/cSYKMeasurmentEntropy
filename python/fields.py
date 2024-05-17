@@ -53,7 +53,7 @@ def convert_map_to_matrix(map, matrix, step):
         row = []
         for j in range(len(map[i])):
             x,y,c = map[i][j]
-            new_matrix = c*np.array([matrix[step*x+k][step*y:step*(y+1)] for k in range(step)])
+            new_matrix = c*np.array(matrix[step*x:step*(x+1),step*y:step*(y+1)])
 
             #do any necessary flips
             ax = map[-1]
@@ -78,7 +78,7 @@ def invert_maps(maps, matrices, step):
         for i in range(len(map)-1):
             for j in range(len(map[i])):
                 x,y,c = map[i][j]
-                new_matrix = np.array([matrix[step*i+k][step*j:step*(j+1)] for k in range(step)])/c
+                new_matrix = np.array(matrix[step*i:step*(i+1),step*j:step*(j+1)])/c
 
                 #do any necessary flips
                 ax = map[-1]
