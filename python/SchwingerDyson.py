@@ -74,7 +74,7 @@ class SchwingerDyson:
         #denominator
         brace = -self.m/2*Gdij['G11'] + self.m/2*Gdij['G22'] - self.m/2*Gdij['G12'] + self.m/2*Gdij['G21'] + (1-self.m)*self.G33d
         Sigma_d11 = -2*self.Jsqr*np.multiply(np.power(brace,self.q/2), np.power(np.transpose(brace),self.q/2-1))
-        Sigma_d_dict = {'G11': Sigma_d11, 'G22': -Sigma_d11, 'G12': -Sigma_d11, 'G21': Sigma_d11}
+        Sigma_d_dict = {'G11': Sigma_d11, 'G22': -Sigma_d11, 'G12': -Sigma_d11, 'G21': Sigma_d11} #Sigma12 must be mapped with the G21 map and vice versa
         #update Sigma matrices
         self.Sigma33d = -Sigma_d11
 
