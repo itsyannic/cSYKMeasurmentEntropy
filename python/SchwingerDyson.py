@@ -116,10 +116,19 @@ class SchwingerDyson:
         aux = self.G33n_old
         self.G33n_old = self.G33n
         self.G33n = aux
-        
+
+    #returns the larges error found    
     def get_error(self):
 
-        return
+        error = 0
+
+        matrices = [self.Ghatd - self.Ghatd_old, self.Ghatn - self.Ghatn_old, self.G33d-self.G33d_old, self.G33n - self.G33n_old]
+        for matrix in matrices:
+            e = abs(np.trace(matrix@matrix))
+            if (e > error):
+                error = e
+
+        return error
 
     #iteratively solve the Schinger-Dyson equations
     def solve(self):
