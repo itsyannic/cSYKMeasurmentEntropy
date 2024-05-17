@@ -68,8 +68,8 @@ class SchwingerDyson:
     #Calculate Gijs from Ghat, use second S.-D. equation to calculate Sigma_ijs and then calculate Sigma_hat
     def get_Sigma(self):
 
-        Gdij = fields.read_G_from_Ghat(self.Ghatd)
-        Gnij = fields.read_G_from_Ghat(self.Ghatn)
+        Gdij = fields.read_G_from_Ghat(self.Ghatd, int(self.discretization/2))
+        Gnij = fields.read_G_from_Ghat(self.Ghatn, int(self.discretization/2))
         
         #denominator
         brace = -self.m/2*Gdij['G11'] + self.m/2*Gdij['G22'] - self.m/2*Gdij['G12'] + self.m/2*Gdij['G21'] + (1-self.m)*self.G33d
@@ -78,7 +78,7 @@ class SchwingerDyson:
         #update Sigma matrices
         self.Sigma33d = -Sigma_d11
 
-        self.Sigmahatd = fields.create_Sigma_hat(Sigma_d_dict,self.beta/2)
+        self.Sigmahatd = fields.create_Sigma_hat(Sigma_d_dict,int(self.discretization/2))
        
         #numerator
         brace = -self.m/2*Gnij['G11'] + self.m/2*Gnij['G22'] - self.m/2*Gnij['G12'] + self.m/2*Gnij['G21'] + (1-self.m)*self.G33n
@@ -88,7 +88,7 @@ class SchwingerDyson:
         #update Sigma matrices
         self.Sigma33n = -Sigma_n11
 
-        self.Sigmahatn = fields.create_Sigma_hat(Sigma_n_dict,self.beta/2)
+        self.Sigmahatn = fields.create_Sigma_hat(Sigma_n_dict,int(self.discretization/2))
     
     #use first S.-D. equation to calculate Ghat and G33
     def get_G(self, weight):

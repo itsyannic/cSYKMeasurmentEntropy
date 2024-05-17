@@ -1,13 +1,8 @@
-import numpy
+import numpy as np
 import SchwingerDyson
 import fields
 
-sd = SchwingerDyson.SchwingerDyson(1,1,1,0,4)
+sd = SchwingerDyson.SchwingerDyson(100,8,1,0,100,0.0001)
+sd.solve()
 
-matrices = fields.convert_map_to_matrix(fields.test,2)
-
-maps = [fields.G11, fields.G22, fields.G12, fields.G21]
-
-test2 = fields.invert_maps(matrices,2)
-
-print(fields.test-test2)
+print(np.trace(sd.Ghatn))
