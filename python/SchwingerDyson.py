@@ -68,19 +68,20 @@ class SchwingerDyson:
         #denominator
         brace = -self.m/2*Gdij['G11'] + self.m/2*Gdij['G22'] - self.m/2*Gdij['G12'] + self.m/2*Gdij['G21'] + (1-self.m)*self.G33d
         Sigma_d11 = -2*self.Jsqr*np.multiply(np.power(brace,self.q/2), np.power(np.transpose(brace),self.q/2-1))
+        Sigma_d_dict = {'G11': Sigma_d11, 'G22': -Sigma_d11, 'G12': -Sigma_d11, 'G21': Sigma_d11}
+        #update Sigma matrices
+        self.Sigma33d = -Sigma_d11
+
+        self.Sigmahatd = fields.create_Sigma_hat(Sigma_d_dict,self.beta/2)
+       
         #numerator
         brace = -self.m/2*Gnij['G11'] + self.m/2*Gnij['G22'] - self.m/2*Gnij['G12'] + self.m/2*Gnij['G21'] + (1-self.m)*self.G33n
         Sigma_n11 = -2*self.Jsqr*np.multiply(np.power(brace,self.q/2), np.power(np.transpose(brace),self.q/2-1))
         #the factor of two is ther to account for the fact that the Ghat matrix has a 1/2 in front while Sigmahat does not
-
-        Sigma_d_dict = {'G11': Sigma_d11, 'G22': -Sigma_d11, 'G12': -Sigma_d11, 'G21': Sigma_d11}
         Sigma_n_dict = {'G11': Sigma_n11, 'G22': -Sigma_n11, 'G12': -Sigma_n11, 'G21': Sigma_n11}
-
         #update Sigma matrices
-        self.Sigma33d = -Sigma_d11
         self.Sigma33n = -Sigma_n11
 
-        self.Sigmahatd = fields.create_Sigma_hat(Sigma_d_dict,self.beta/2)
         self.Sigmahatn = fields.create_Sigma_hat(Sigma_n_dict,self.beta/2)
     
     #use first S.-D. equation to calculate Ghat and G33
