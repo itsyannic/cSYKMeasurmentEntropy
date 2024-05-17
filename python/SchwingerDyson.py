@@ -1,15 +1,16 @@
 import numpy as np
+import fields
 
 class SchwingerDyson:
 
-    def __init__(self, beta, q, J, m, discretization, steps=1000):
+    def __init__(self, beta, q, J, m, discretization, error_threshold, weight=0.05, max_iter=1000):
 
         self.q = q
         self.beta = beta
         self.J = J
         self.m = m
         self.discretization = discretization
-        self.steps = steps
+        self.max_iter = max_iter
 
         self.G33n = np.zeros((2*discretization, 2*discretization), dtype=np.double)
         self.G33d = np.zeros((2*discretization, 2*discretization), dtype=np.double)
@@ -25,6 +26,11 @@ class SchwingerDyson:
         self.Sigmahatd = np.zeros((4*discretization, 4*discretization), dtype=np.double)
         self.Sigma33n = np.zeros((2*discretization, 2*discretization), dtype=np.double)
         self.Sigma33d = np.zeros((2*discretization, 2*discretization), dtype=np.double)
+
+        self.error_threshold = error_threshold
+        self.initial_weight = weight
+
+        self.iter_count = 0
 
         self.init_matrices()
 
@@ -55,16 +61,71 @@ class SchwingerDyson:
     #Calculate Gijs from Ghat, use second S.-D. equation to calculate Sigma_ijs and then calculate Sigma_hat
     def get_Sigma(self):
 
+        Gdij = fields.read_G_from_Ghat(self.Ghatd)
+        Gnij = fields.read_G_from_Ghat(self.Ghatn)
+
         return
     
     #use first S.-D. equation to calculate Ghat and G33
-    def get_G(self):
+    def get_G(self, weight):
+
+        return
+    
+    #swap the labels for the old and the current matrix
+    def swap(self):
+        aux = self.Ghatd_old
+        self.Ghatd_old = self.Ghatd
+        self.Ghatd = aux
+
+        aux = self.Ghatn_old
+        self.Ghatn_old = self.Ghatn
+        self.Ghatn = aux
+        
+        aux = self.G33d_old
+        self.G33d_old = self.G33d
+        self.G33d = aux
+
+        aux = self.G33n_old
+        self.G33n_old = self.G33n
+        self.G33n = aux
+        
+    def get_error(self):
 
         return
 
     #iteratively solve the Schinger-Dyson equations
     def solve(self):
 
-        return
-        
+        weight = self.initial_weight
+
+        self.get_Sigma()
+        self.swap()
+        self.get_G(weight)
+
+        old_error = self.get_error()
+
+        i = 1
+
+        while(old_error >= self.error_threshold):
+
+            self.get_Sigma()
+            self.swap()
+            self.get_G(weight)
+
+            error = self.get_error()
+
+            if error > old_error:
+                weight = weight/2
+
+            old_error = error
+
+            i += 1
+
+            if (i > self.max_iter):
+                break
+
+        self.iter_count = i
+
+
+
 
