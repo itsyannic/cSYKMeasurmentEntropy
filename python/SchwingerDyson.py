@@ -35,6 +35,12 @@ class SchwingerDyson:
 
         self.init_matrices()
 
+        self.Ghat_d_free_inverse = np.linalg.inv(self.Ghatd)
+        self.Ghat_n_free_inverse = np.linalg.inv(self.Ghatn)
+
+        self.G33_d_free_inverse = np.linalg.inv(self.G33d)
+        self.G33_n_free_inverse = np.linalg.inv(self.G33n)
+
     def init_matrices(self):
 
         for i in range(2*self.discretization):
@@ -87,7 +93,11 @@ class SchwingerDyson:
     #use first S.-D. equation to calculate Ghat and G33
     def get_G(self, weight):
 
-        return
+        self.Ghatd = (1-weight)*self.Ghatd_old+weight*np.linalg.inv(self.Ghat_d_free_inverse - self.Sigmahatd)
+        self.Ghatn = (1-weight)*self.Ghatn_old+weight*np.linalg.inv(self.Ghat_n_free_inverse - self.Sigmahatn)
+
+        self.G33d = (1-weight)*self.G33d_old+weight*np.linalg.inv(self.G33_d_free_inverse - self.Sigma33d)
+        self.G33n = (1-weight)*self.G33n_old+weight*np.linalg.inv(self.G33_n_free_inverse - self.Sigma33n)
     
     #swap the labels for the old and the current matrix
     def swap(self):
