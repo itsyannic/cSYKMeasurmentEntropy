@@ -117,7 +117,7 @@ class SchwingerDyson:
         self.G33n_old = self.G33n
         self.G33n = aux
 
-    #returns the larges error found    
+    #returns the largest error found    
     def __get_error(self):
 
         error = 0
