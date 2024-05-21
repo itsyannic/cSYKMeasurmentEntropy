@@ -1,7 +1,25 @@
 import numpy as np
+import json
 from SchwingerDyson import SchwingerDyson
+import physics
 
-sd = SchwingerDyson(100,8,1,0,500,0.000000001)
-sd.solve()
+num_ms = 5
+q = 8
+beta = 100
+J = 1
 
-print(np.trace(sd.Ghatn))
+results = []
+
+for i in range(num_ms):
+    m = 1.0*(i/num_ms)
+
+    sd = SchwingerDyson(beta,q,J,m,100,0.000000001)
+    sd.solve()
+    results.append(physics.results(sd))
+
+
+param = {'q': q, 'beta': beta, 'J': J, 'data': results}
+json_obj = json.dumps(param)
+output = open("data.out", "w")
+
+output.write(json_obj)
