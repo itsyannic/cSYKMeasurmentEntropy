@@ -66,7 +66,7 @@ class SchwingerDyson:
                     self.Ghatd[i,j] = 0
 
     #Calculate Gijs from Ghat, use second S.-D. equation to calculate Sigma_ijs and then calculate Sigma_hat
-    def get_Sigma(self):
+    def __get_Sigma(self):
 
         Gdij = fields.read_G_from_Ghat(self.Ghatd, int(self.discretization/2))
         Gnij = fields.read_G_from_Ghat(self.Ghatn, int(self.discretization/2))
@@ -91,7 +91,7 @@ class SchwingerDyson:
         self.Sigmahatn = fields.create_Sigma_hat(Sigma_n_dict,int(self.discretization/2))
     
     #use first S.-D. equation to calculate Ghat and G33
-    def get_G(self, weight):
+    def __get_G(self, weight):
     
         self.Ghatd = (1-weight)*self.Ghatd_old+weight*np.linalg.inv(self.Ghat_d_free_inverse.astype(np.double) - self.Sigmahatd.astype(np.double))
         self.Ghatn = (1-weight)*self.Ghatn_old+weight*np.linalg.inv(self.Ghat_n_free_inverse.astype(np.double) - self.Sigmahatn.astype(np.double))
@@ -100,7 +100,7 @@ class SchwingerDyson:
         self.G33n = (1-weight)*self.G33n_old+weight*np.linalg.inv(self.G33_n_free_inverse.astype(np.double) - self.Sigma33n.astype(np.double))
     
     #swap the labels for the old and the current matrix
-    def swap(self):
+    def __swap(self):
         aux = self.Ghatd_old
         self.Ghatd_old = self.Ghatd
         self.Ghatd = aux
@@ -118,7 +118,7 @@ class SchwingerDyson:
         self.G33n = aux
 
     #returns the larges error found    
-    def get_error(self):
+    def __get_error(self):
 
         error = 0
 
@@ -135,21 +135,21 @@ class SchwingerDyson:
 
         weight = self.initial_weight
 
-        self.get_Sigma()
-        self.swap()
-        self.get_G(weight)
+        self.__get_Sigma()
+        self.__swap()
+        self.__get_G(weight)
 
-        old_error = self.get_error()
+        old_error = self.__get_error()
 
         i = 1
 
         while(old_error >= self.error_threshold):
 
-            self.get_Sigma()
-            self.swap()
-            self.get_G(weight)
+            self.__get_Sigma()
+            self.__swap()
+            self.__get_G(weight)
 
-            error = self.get_error()
+            error = self.__get_error()
 
             if error > old_error:
                 weight = weight/2
