@@ -159,6 +159,7 @@ class SchwingerDyson:
             i += 1
 
             if (i > self.max_iter):
+                print("Warning: max. number of iterations reached.\n")
                 break
 
         self.iter_count = i
