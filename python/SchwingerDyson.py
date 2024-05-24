@@ -5,11 +5,11 @@ class SchwingerDyson:
 
     def __init__(self, beta, q, J, m, discretization, error_threshold, weight=0.05, max_iter=1000):
 
-        self.q = q
-        self.beta = beta
-        self.J = J
-        self.Jsqr = J**2
-        self.m = m
+        self.q = np.double(q)
+        self.beta = np.double(beta)
+        self.J = np.double(J)
+        self.Jsqr = np.double(J**2)
+        self.m = np.double(m)
         self.discretization = discretization
         self.max_iter = max_iter
 
@@ -28,8 +28,8 @@ class SchwingerDyson:
         self.Sigma33n = np.zeros((2*discretization, 2*discretization), dtype=np.double)
         self.Sigma33d = np.zeros((2*discretization, 2*discretization), dtype=np.double)
 
-        self.error_threshold = error_threshold
-        self.initial_weight = weight
+        self.error_threshold = np.double(error_threshold)
+        self.initial_weight = np.double(weight)
 
         self.iter_count = 0
 
@@ -45,10 +45,10 @@ class SchwingerDyson:
 
         for i in range(2*self.discretization):
             for j in range(2*self.discretization):
-                self.G33n[i,j] = 0.5*np.sign(i-j)
+                self.G33n[i,j] = 0.5*np.sign(i-j, dtype=np.double)
 
                 if ((i<self.discretization and j<self.discretization) or (i >= self.discretization and j>=self.discretization )):
-                    self.G33d[i,j] = 0.5*np.sign(i-j)
+                    self.G33d[i,j] = 0.5*np.sign(i-j, dtype=np.double)
                 else:
                     self.G33d[i,j] = 0
 
@@ -56,12 +56,12 @@ class SchwingerDyson:
             for j in range(4*self.discretization):
 
                 if ( ((self.discretization<=i<3*self.discretization) and (self.discretization<=j<3*self.discretization)) or (( i< self.discretization or 3*self.discretization<=i<4*self.discretization) and ( j< self.discretization or 3*self.discretization<=j<4*self.discretization))):
-                    self.Ghatn[i,j] = 0.5*np.sign(i-j)
+                    self.Ghatn[i,j] = 0.5*np.sign(i-j, dtype=np.double)
                 else:
                     self.Ghatn[i,j] = 0
 
                 if ((i<2*self.discretization and j<2*self.discretization) or (i >= 2*self.discretization and j>=2*self.discretization )):
-                    self.Ghatd[i,j] = 0.5*np.sign(i-j)
+                    self.Ghatd[i,j] = 0.5*np.sign(i-j, dtype=np.double)
                 else:
                     self.Ghatd[i,j] = 0
 
@@ -120,11 +120,11 @@ class SchwingerDyson:
     #returns the largest error found    
     def __get_error(self):
 
-        error = 0
+        error = np.double(0)
 
         matrices = [self.Ghatd - self.Ghatd_old, self.Ghatn - self.Ghatn_old, self.G33d-self.G33d_old, self.G33n - self.G33n_old]
         for matrix in matrices:
-            e = abs(np.trace(matrix@matrix))
+            e = np.abs(np.trace(matrix@matrix))
             if (e > error):
                 error = e
 

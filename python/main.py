@@ -13,7 +13,7 @@ results = []
 for i in range(num_ms):
     m = 1.0*(i/num_ms)
 
-    sd = SchwingerDyson(beta,q,J,m,500,0.0000000001)
+    sd = SchwingerDyson(beta,q,J,m,500,0.0000001)
     sd.solve()
     results.append(physics.results(sd))
 
