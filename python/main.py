@@ -3,8 +3,8 @@ import json
 from SchwingerDyson import SchwingerDyson
 import physics
 
-ms = [0,0.2,0.3]
-q = 12
+ms = [0.0]
+q = 8
 beta = 50
 J = 1
 

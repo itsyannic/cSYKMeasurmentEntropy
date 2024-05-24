@@ -71,19 +71,20 @@ class SchwingerDyson:
         #denominator
         Gdij = fields.read_G_from_Ghat(self.Ghatd, int(self.discretization/2))
 
-        brace = self.m/2*(-Gdij['G11'] + Gdij['G22'] - Gdij['G12'] + Gdij['G21']) + (1-self.m)*self.G33d
+        brace = self.m/4*(-Gdij['G11'] + Gdij['G22'] - Gdij['G12'] + Gdij['G21']) + (1-self.m)*self.G33d
         Sigma_d11 = -self.__normalization*self.Jsqr*np.multiply(np.power(brace,self.q/2), np.power(np.transpose(brace),self.q/2-1))
         Sigma_d_dict = {'G11': Sigma_d11*2, 'G22': -Sigma_d11*2, 'G12': -Sigma_d11*2, 'G21': Sigma_d11*2} #Sigma12 must be mapped with the G21 map and vice versa
         #the factor of two is ther to account for the fact that the Ghat matrix has a 1/2 in front while Sigmahat does not
         #update Sigma matrices
         self.Sigma33d = -Sigma_d11
+        #print(max(np.amax(Sigma_d11),abs(np.amin(Sigma_d11))))
 
         self.Sigmahatd = fields.create_Sigma_hat(Sigma_d_dict,int(self.discretization/2))
        
         #numerator
         Gnij = fields.read_G_from_Ghat(self.Ghatn, int(self.discretization/2))
 
-        brace = self.m/2*(-Gnij['G11'] + Gnij['G22'] -Gnij['G12'] + Gnij['G21']) + (1-self.m)*self.G33n
+        brace = self.m/4*(-Gnij['G11'] + Gnij['G22'] -Gnij['G12'] + Gnij['G21']) + (1-self.m)*self.G33n
         Sigma_n11 = -self.__normalization*self.Jsqr*np.multiply(np.power(brace,self.q/2), np.power(np.transpose(brace),self.q/2-1))
         Sigma_n_dict = {'G11': Sigma_n11*2, 'G22': -Sigma_n11*2, 'G12': -Sigma_n11*2, 'G21': Sigma_n11*2}
         #the factor of two is ther to account for the fact that the Ghat matrix has a 1/2 in front while Sigmahat does not
