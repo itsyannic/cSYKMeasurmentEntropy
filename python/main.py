@@ -3,9 +3,9 @@ import json
 from SchwingerDyson import SchwingerDyson
 import physics
 
-ms = [0.1,0.3,0.6]
+ms = [0,0.2,0.3]
 q = 8
-beta = 100
+beta = 2
 J = 1
 
 results = []
@@ -14,6 +14,7 @@ for m in ms:
     sd = SchwingerDyson(beta,q,J,m,200,0.00000001)
     sd.solve()
     results.append(physics.results(sd))
+    print(sd.iter_count)
     print(m)
 
 

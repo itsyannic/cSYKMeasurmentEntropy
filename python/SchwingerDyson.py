@@ -73,7 +73,8 @@ class SchwingerDyson:
 
         brace = self.m/2*(-Gdij['G11'] + Gdij['G22'] - Gdij['G12'] + Gdij['G21']) + (1-self.m)*self.G33d
         Sigma_d11 = -self.__normalization*self.Jsqr*np.multiply(np.power(brace,self.q/2), np.power(np.transpose(brace),self.q/2-1))
-        Sigma_d_dict = {'G11': Sigma_d11/2, 'G22': -Sigma_d11/2, 'G12': -Sigma_d11/2, 'G21': Sigma_d11/2} #Sigma12 must be mapped with the G21 map and vice versa
+        Sigma_d_dict = {'G11': Sigma_d11*2, 'G22': -Sigma_d11*2, 'G12': -Sigma_d11*2, 'G21': Sigma_d11*2} #Sigma12 must be mapped with the G21 map and vice versa
+        #the factor of two is ther to account for the fact that the Ghat matrix has a 1/2 in front while Sigmahat does not
         #update Sigma matrices
         self.Sigma33d = -Sigma_d11
 
@@ -84,8 +85,8 @@ class SchwingerDyson:
 
         brace = self.m/2*(-Gnij['G11'] + Gnij['G22'] -Gnij['G12'] + Gnij['G21']) + (1-self.m)*self.G33n
         Sigma_n11 = -self.__normalization*self.Jsqr*np.multiply(np.power(brace,self.q/2), np.power(np.transpose(brace),self.q/2-1))
+        Sigma_n_dict = {'G11': Sigma_n11*2, 'G22': -Sigma_n11*2, 'G12': -Sigma_n11*2, 'G21': Sigma_n11*2}
         #the factor of two is ther to account for the fact that the Ghat matrix has a 1/2 in front while Sigmahat does not
-        Sigma_n_dict = {'G11': Sigma_n11/2, 'G22': -Sigma_n11/2, 'G12': -Sigma_n11/2, 'G21': Sigma_n11/2}
         #update Sigma matrices
         self.Sigma33n = -Sigma_n11
 
@@ -97,7 +98,7 @@ class SchwingerDyson:
         self.Ghatd = (1-weight)*self.Ghatd_old+weight*np.linalg.inv(self.Ghat_d_free_inverse.astype(np.double) - self.Sigmahatd.astype(np.double))
         self.Ghatn = (1-weight)*self.Ghatn_old+weight*np.linalg.inv(self.Ghat_n_free_inverse.astype(np.double) - self.Sigmahatn.astype(np.double))
 
-        self.G33d = (1-weight)*self.G33d_old+weight*np.linalg.inv(self.G33_d_free_inverse.astype(np.double) - self.Sigma33d.astype(np.double))
+        self.G33d = (1-weight)*self.G33d_old + weight*np.linalg.inv(self.G33_d_free_inverse.astype(np.double) - self.Sigma33d.astype(np.double))
         self.G33n = (1-weight)*self.G33n_old+weight*np.linalg.inv(self.G33_n_free_inverse.astype(np.double) - self.Sigma33n.astype(np.double))
     
     #swap the labels for the old and the current matrix
@@ -145,7 +146,7 @@ class SchwingerDyson:
 
         i = 1
 
-        while(old_error >= weight*self.error_threshold):
+        while(old_error >= weight**2*self.error_threshold):
 
             self.__get_Sigma()
             self.__swap()
@@ -155,6 +156,7 @@ class SchwingerDyson:
 
             if error > old_error:
                 weight = weight/2
+                print("Weight updated at iteration step n = " + str(i) + ": x = "+ str(weight) + "\n")
 
             old_error = error
 
