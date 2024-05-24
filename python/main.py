@@ -3,7 +3,7 @@ import json
 from SchwingerDyson import SchwingerDyson
 import physics
 
-ms = [0,0.5,0.9]
+ms = [0.1,0.3,0.6]
 q = 8
 beta = 100
 J = 1
@@ -11,10 +11,10 @@ J = 1
 results = []
 
 for m in ms:
-    print(m)
-    sd = SchwingerDyson(beta,q,J,m,100,0.00000001)
+    sd = SchwingerDyson(beta,q,J,m,200,0.00000001)
     sd.solve()
     results.append(physics.results(sd))
+    print(m)
 
 
 param = {'q': q, 'beta': beta, 'J': J, 'data': results}

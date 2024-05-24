@@ -34,7 +34,7 @@ def charge(SD_Object: SchwingerDyson, Iden):
 
 def renyi2(Iden, Inum):
 
-    return Inum - Iden
+    return (Inum - Iden)/2
 
 def results(SD_Object: SchwingerDyson):
 

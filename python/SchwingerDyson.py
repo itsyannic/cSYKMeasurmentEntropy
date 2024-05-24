@@ -30,7 +30,7 @@ class SchwingerDyson:
 
         self.error_threshold = np.double(error_threshold)
         self.initial_weight = np.double(weight)
-
+        self.__normalization = np.power(self.beta/self.discretization,2)
         self.iter_count = 0
 
         self.init_matrices()
@@ -72,7 +72,7 @@ class SchwingerDyson:
         Gdij = fields.read_G_from_Ghat(self.Ghatd, int(self.discretization/2))
 
         brace = self.m/2*(-Gdij['G11'] + Gdij['G22'] - Gdij['G12'] + Gdij['G21']) + (1-self.m)*self.G33d
-        Sigma_d11 = -self.Jsqr*np.multiply(np.power(brace,self.q/2), np.power(np.transpose(brace),self.q/2-1))
+        Sigma_d11 = -self.__normalization*self.Jsqr*np.multiply(np.power(brace,self.q/2), np.power(np.transpose(brace),self.q/2-1))
         Sigma_d_dict = {'G11': Sigma_d11/2, 'G22': -Sigma_d11/2, 'G12': -Sigma_d11/2, 'G21': Sigma_d11/2} #Sigma12 must be mapped with the G21 map and vice versa
         #update Sigma matrices
         self.Sigma33d = -Sigma_d11
@@ -83,7 +83,7 @@ class SchwingerDyson:
         Gnij = fields.read_G_from_Ghat(self.Ghatn, int(self.discretization/2))
 
         brace = self.m/2*(-Gnij['G11'] + Gnij['G22'] -Gnij['G12'] + Gnij['G21']) + (1-self.m)*self.G33n
-        Sigma_n11 = -self.Jsqr*np.multiply(np.power(brace,self.q/2), np.power(np.transpose(brace),self.q/2-1))
+        Sigma_n11 = -self.__normalization*self.Jsqr*np.multiply(np.power(brace,self.q/2), np.power(np.transpose(brace),self.q/2-1))
         #the factor of two is ther to account for the fact that the Ghat matrix has a 1/2 in front while Sigmahat does not
         Sigma_n_dict = {'G11': Sigma_n11/2, 'G22': -Sigma_n11/2, 'G12': -Sigma_n11/2, 'G21': Sigma_n11/2}
         #update Sigma matrices
@@ -123,7 +123,8 @@ class SchwingerDyson:
 
         error = np.double(0)
 
-        matrices = [self.Ghatd - self.Ghatd_old, self.Ghatn - self.Ghatn_old, self.G33d-self.G33d_old, self.G33n - self.G33n_old]
+        matrices = [(self.Ghatd - self.Ghatd_old)/(self.discretization*4), (self.Ghatn - self.Ghatn_old)/(self.discretization*4), 
+                    (self.G33d-self.G33d_old)/(self.discretization*2), (self.G33n - self.G33n_old)/(self.discretization*2)]
         for matrix in matrices:
             e = np.abs(np.trace(matrix@matrix))
             if (e > error):
@@ -144,7 +145,7 @@ class SchwingerDyson:
 
         i = 1
 
-        while(old_error >= self.error_threshold):
+        while(old_error >= weight*self.error_threshold):
 
             self.__get_Sigma()
             self.__swap()
