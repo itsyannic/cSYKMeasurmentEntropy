@@ -55,7 +55,7 @@ class SchwingerDyson:
         for i in range(4*self.discretization):
             for j in range(4*self.discretization):
 
-                if ( ((self.discretization<=i<3*self.discretization) and (self.discretization<=j<3*self.discretization)) or (( i< self.discretization or 3*self.discretization<=i<4*self.discretization) and ( j< self.discretization or 3*self.discretization<=j<4*self.discretization))):
+                if ( ((self.discretization<=i<3*self.discretization) and (self.discretization<=j<3*self.discretization)) or (( i< self.discretization or 3*self.discretization<=i<4*self.discretization) and ( j < self.discretization or 3*self.discretization<=j<4*self.discretization))):
                     self.Ghatn[i,j] = 0.5*np.sign(i-j, dtype=np.double)
                 else:
                     self.Ghatn[i,j] = 0
@@ -67,24 +67,25 @@ class SchwingerDyson:
 
     #Calculate Gijs from Ghat, use second S.-D. equation to calculate Sigma_ijs and then calculate Sigma_hat
     def __get_Sigma(self):
-
-        Gdij = fields.read_G_from_Ghat(self.Ghatd, int(self.discretization/2))
-        Gnij = fields.read_G_from_Ghat(self.Ghatn, int(self.discretization/2))
         
         #denominator
+        Gdij = fields.read_G_from_Ghat(self.Ghatd, int(self.discretization/2))
+
         brace = -self.m/2*Gdij['G11'] + self.m/2*Gdij['G22'] - self.m/2*Gdij['G12'] + self.m/2*Gdij['G21'] + (1-self.m)*self.G33d
-        Sigma_d11 = -2*self.Jsqr*np.multiply(np.power(brace,self.q/2), np.power(np.transpose(brace),self.q/2-1))
-        Sigma_d_dict = {'G11': Sigma_d11, 'G22': -Sigma_d11, 'G12': -Sigma_d11, 'G21': Sigma_d11} #Sigma12 must be mapped with the G21 map and vice versa
+        Sigma_d11 = -self.Jsqr*np.multiply(np.power(brace,self.q/2), np.power(np.transpose(brace),self.q/2-1))
+        Sigma_d_dict = {'G11': Sigma_d11/2, 'G22': -Sigma_d11/2, 'G12': -Sigma_d11/2, 'G21': Sigma_d11/2} #Sigma12 must be mapped with the G21 map and vice versa
         #update Sigma matrices
         self.Sigma33d = -Sigma_d11
 
         self.Sigmahatd = fields.create_Sigma_hat(Sigma_d_dict,int(self.discretization/2))
        
         #numerator
+        Gnij = fields.read_G_from_Ghat(self.Ghatn, int(self.discretization/2))
+
         brace = -self.m/2*Gnij['G11'] + self.m/2*Gnij['G22'] - self.m/2*Gnij['G12'] + self.m/2*Gnij['G21'] + (1-self.m)*self.G33n
-        Sigma_n11 = -2*self.Jsqr*np.multiply(np.power(brace,self.q/2), np.power(np.transpose(brace),self.q/2-1))
+        Sigma_n11 = -self.Jsqr*np.multiply(np.power(brace,self.q/2), np.power(np.transpose(brace),self.q/2-1))
         #the factor of two is ther to account for the fact that the Ghat matrix has a 1/2 in front while Sigmahat does not
-        Sigma_n_dict = {'G11': Sigma_n11, 'G22': -Sigma_n11, 'G12': -Sigma_n11, 'G21': Sigma_n11}
+        Sigma_n_dict = {'G11': Sigma_n11/2, 'G22': -Sigma_n11/2, 'G12': -Sigma_n11/2, 'G21': Sigma_n11/2}
         #update Sigma matrices
         self.Sigma33n = -Sigma_n11
 
