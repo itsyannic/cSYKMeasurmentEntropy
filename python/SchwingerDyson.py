@@ -156,7 +156,7 @@ class SchwingerDyson:
 
             if error > old_error:
                 weight = weight/2
-                print("Weight updated at iteration step n = " + str(i) + ": x = "+ str(weight) + "\n")
+                #print("Weight updated at iteration step n = " + str(i) + ": x = "+ str(weight) + "\n")
 
             old_error = error
 

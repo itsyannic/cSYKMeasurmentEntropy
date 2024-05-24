@@ -4,17 +4,16 @@ from SchwingerDyson import SchwingerDyson
 import physics
 
 ms = [0,0.2,0.3]
-q = 8
-beta = 2
+q = 12
+beta = 50
 J = 1
 
 results = []
 
 for m in ms:
-    sd = SchwingerDyson(beta,q,J,m,200,0.00000001)
+    sd = SchwingerDyson(beta,q,J,m,200,0.00000001,weight=0.005)
     sd.solve()
     results.append(physics.results(sd))
-    print(sd.iter_count)
     print(m)
 
 
