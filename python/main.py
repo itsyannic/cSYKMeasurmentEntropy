@@ -5,7 +5,7 @@ from SchwingerDyson import SchwingerDyson
 import physics
 
 #set plot parameters
-ms = np.linspace(0,1,10,endpoint=False)
+ms = np.linspace(0,1,10,endpoint=False, dtype=np.double)
 q = 8
 beta = 100
 J = 1
@@ -27,11 +27,11 @@ output = open("data.out", "w")
 #plot data
 Q = [point['charge'] for point in results]
 I = [point['renyi2'] for point in results]
+output.write(json_obj)
+output.close()
 
 plt.scatter(Q,I)
 plt.xlabel('Charge Q')
 plt.ylabel('Renyi-2 Entropy I2')
 plt.title('beta = ' + str(beta) + ', q=' + str(q))
 plt.show()
-
-output.write(json_obj)
