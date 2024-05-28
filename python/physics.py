@@ -9,7 +9,7 @@ def on_shell_action_den(SD_Object: SchwingerDyson):
     term1 = -m/2*(np.log(arg) + 2*np.log(2,dtype=np.double)) 
     term2 = -(1-m)*(np.log(np.linalg.det(np.linalg.inv(SD_Object.G33_d_free_inverse@SD_Object.G33d))) + 2*np.log(2,dtype=np.double))
     Gdij = fields.read_G_from_Ghat(SD_Object.Ghatd, int(SD_Object.discretization/2))
-    brace = -m/2*Gdij['G11'] + m/2*Gdij['G22'] - m/2*Gdij['G12'] + m/2*Gdij['G21'] + (1-m)*SD_Object.G33d
+    brace = -m/4*Gdij['G11'] + m/4*Gdij['G22'] - m/4*Gdij['G12'] + m/4*Gdij['G21'] + (1-m)*SD_Object.G33d
     Gsqr = np.power(brace,SD_Object.q/2)
     term3 = -SD_Object.Jsqr*(1/SD_Object.q - 1)*np.trace(Gsqr@Gsqr)/(SD_Object.discretization*2)**2
 

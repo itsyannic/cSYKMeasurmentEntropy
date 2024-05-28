@@ -15,7 +15,8 @@ def integrand(x,epsilon):
 def _S_0(Q,q,e):
 
     I = sc.integrate.quad(lambda x: integrand(x, e), 0, 1.0/2.0-1.0/q)
-    return I[0] +2*np.pi*e*Q
+    return I[0] + 2*np.pi*e*Q
+    #return 2*np.log(2)
 
 
 def _S_Gravity(Q,q,beta_x_curlyJ,e):
