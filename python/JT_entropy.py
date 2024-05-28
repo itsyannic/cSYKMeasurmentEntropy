@@ -41,4 +41,4 @@ def _S_UV(m):
 
 def S_gen(Q,m,q,beta,J):
 
-    return np.min(_S_UV(m), _S_IR(Q,m,q,beta,J))
+    return np.minimum(_S_UV(m), _S_IR(Q,m,q,beta,J))
