@@ -3,11 +3,12 @@ from matplotlib import pyplot as plt
 import json
 from SchwingerDyson import SchwingerDyson
 import physics
+import JT_entropy
 
 #set plot parameters
 ms = np.linspace(0,1,10,endpoint=False, dtype=np.double)
 q = 8
-beta = 100
+beta = 50
 J = 1
 
 #generate numerical data
@@ -25,12 +26,14 @@ json_obj = json.dumps(param)
 output = open("data.out", "w")
 
 #plot data
-Q = [point['charge'] for point in results]
+m = [point['m'] for point in results]
 I = [point['renyi2'] for point in results]
+JT = [JT_entropy.S_gen(point['charge'],point['m'],q,beta,J) for point in results]
 output.write(json_obj)
 output.close()
 
-plt.scatter(Q,I)
+plt.scatter(m,I)
+plt.plot(m,JT)
 plt.xlabel('Charge Q')
 plt.ylabel('Renyi-2 Entropy I2')
 plt.title('beta = ' + str(beta) + ', q=' + str(q))
