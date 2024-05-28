@@ -18,9 +18,9 @@ def _S_0(Q,q,e):
     return I[0] +2*np.pi*e*Q
 
 
-def _S_Gravity(Q,m,q,beta):
+def _S_Gravity(Q,q,beta_x_curlyJ,e):
 
-    return 0
+    return np.pi**2*(q-2)*np.tanh(np.pi*e)/(2*beta_x_curlyJ*q**2*(1-4*Q**2))
 
 def _S_Gauge(Q,q,beta_x_curlyJ,e):
 
@@ -31,7 +31,7 @@ def _S_IR(Q,m,q,beta,J):
     e = _curly_E(Q,m,q,beta)
     betaJ = beta_times_curly_J(q,beta,e,J)
 
-    return _S_Gauge(Q,q,betaJ,e) + _S_Gravity(Q,m,q,betaJ) + _S_0(Q,q,e) -m*2*np.log(2.0)/12.0
+    return _S_Gauge(Q,q,betaJ,e) + _S_Gravity(Q,q,betaJ,e) + _S_0(Q,q,e) -m*2*np.log(2.0)/12.0
 
 def _S_UV(m):
 
@@ -41,4 +41,8 @@ def _S_UV(m):
 
 def S_gen(Q,m,q,beta,J):
 
-    return np.minimum(_S_UV(m), _S_IR(Q,m,q,beta,J))
+    if (m > 0.3):
+        return _S_UV(m)
+
+    else:
+        return np.minimum(_S_UV(m), _S_IR(Q,m,q,beta,J))
