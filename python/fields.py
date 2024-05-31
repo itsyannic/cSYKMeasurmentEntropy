@@ -61,7 +61,7 @@ def read_G_from_Ghat(matrix, step):
             row = []
             for j in range(len(map[i])):
                 x,y,c = map[i][j]
-                new_matrix = np.double(c)*np.array(matrix[step*x:step*(x+1),step*y:step*(y+1)])
+                new_matrix = np.double(c)*np.array(matrix[step*x:step*(x+1),step*y:step*(y+1)])/2
 
                 #do any necessary flips
                 ax = map[-1]
@@ -88,7 +88,7 @@ def create_Sigma_hat(matrices, step):
         for i in range(len(map)-1):
             for j in range(len(map[i])):
                 x,y,c = map[i][j]
-                new_matrix = np.array(matrix[step*i:step*(i+1),step*j:step*(j+1)])/np.double(c)
+                new_matrix = 2*np.array(matrix[step*i:step*(i+1),step*j:step*(j+1)])/np.double(c)
 
                 #do any necessary flips
                 ax = map[-1]
