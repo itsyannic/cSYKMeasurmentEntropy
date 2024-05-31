@@ -96,11 +96,11 @@ class SchwingerDyson:
     #use first S.-D. equation to calculate Ghat and G33
     def __get_G(self, weight):
     
-        self.Ghatd = (1-weight)*self.Ghatd_old+weight*np.linalg.inv(self.Ghat_d_free_inverse.astype(np.double) - self.Sigmahatd.astype(np.double))
-        self.Ghatn = (1-weight)*self.Ghatn_old+weight*np.linalg.inv(self.Ghat_n_free_inverse.astype(np.double) - self.Sigmahatn.astype(np.double))
+        self.Ghatd = (1-weight)*self.Ghatd_old + weight*np.linalg.inv(self.Ghat_d_free_inverse.astype(np.double) - self.Sigmahatd.astype(np.double))
+        self.Ghatn = (1-weight)*self.Ghatn_old + weight*np.linalg.inv(self.Ghat_n_free_inverse.astype(np.double) - self.Sigmahatn.astype(np.double))
 
         self.G33d = (1-weight)*self.G33d_old + weight*np.linalg.inv(self.G33_d_free_inverse.astype(np.double) - self.Sigma33d.astype(np.double))
-        self.G33n = (1-weight)*self.G33n_old+weight*np.linalg.inv(self.G33_n_free_inverse.astype(np.double) - self.Sigma33n.astype(np.double))
+        self.G33n = (1-weight)*self.G33n_old + weight*np.linalg.inv(self.G33_n_free_inverse.astype(np.double) - self.Sigma33n.astype(np.double))
     
     #swap the labels for the old and the current matrix
     def __swap(self):
@@ -127,12 +127,10 @@ class SchwingerDyson:
 
         matrices = [(self.Ghatd - self.Ghatd_old)/(self.discretization*4), (self.Ghatn - self.Ghatn_old)/(self.discretization*4), 
                     (self.G33d-self.G33d_old)/(self.discretization*2), (self.G33n - self.G33n_old)/(self.discretization*2)]
-        for matrix in matrices:
-            e = np.abs(np.trace(matrix@matrix))
-            if (e > error):
-                error = e
+        
+        error = [np.abs(np.trace(matrix@matrix)) for matrix in matrices]
 
-        return error
+        return np.max(error)
 
     #iteratively solve the Schinger-Dyson equations
     def solve(self):
@@ -147,13 +145,14 @@ class SchwingerDyson:
 
         i = 1
 
-        while(old_error >= weight*self.error_threshold):
+        while(old_error >= weight**2*self.error_threshold):
 
             self.__get_Sigma()
             self.__swap()
             self.__get_G(weight)
 
             error = self.__get_error()
+            print(error/weight**2)
 
             if error > old_error:
                 weight = weight/2
