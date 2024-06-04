@@ -152,7 +152,7 @@ class SchwingerDyson:
             self.__get_G(weight)
 
             error = self.__get_error()
-            print(error/weight)
+            #print(error/weight)
 
             if error > old_error:
                 weight = weight/2

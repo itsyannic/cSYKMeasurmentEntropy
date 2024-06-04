@@ -33,8 +33,7 @@ def charge(SD_Object: SchwingerDyson, Iden):
     return SD_Object.m/2 + np.exp(Iden)*(1-SD_Object.m)*np.trace(SD_Object.G33n)/(SD_Object.discretization*2) #?
 
 def renyi2(Iden, Inum):
-
-    print("Renyi 2 = ", Inum - Iden)
+    
     return (Inum - Iden)
 
 def results(SD_Object: SchwingerDyson):
@@ -42,6 +41,6 @@ def results(SD_Object: SchwingerDyson):
     Inum = (on_shell_action_num(SD_Object)).astype(np.double)
     Iden = (on_shell_action_den(SD_Object)).astype(np.double)
     I2 = renyi2(Iden, Inum).astype(np.double)
-    Q = charge(SD_Object,Iden)
+    Q = charge(SD_Object,Iden).astype(np.double)
 
     return {'m': SD_Object.m, 'Inum': Inum, 'Iden': Iden, 'renyi2': I2, 'charge': Q}
