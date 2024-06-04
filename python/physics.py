@@ -7,11 +7,11 @@ def on_shell_action_den(SD_Object: SchwingerDyson):
     m = SD_Object.m
     arg = np.linalg.det(np.linalg.inv(SD_Object.Ghat_d_free_inverse@SD_Object.Ghatd))
     term1 = -m/4*(np.log(arg) + 2*np.log(2,dtype=np.double)) 
-    term2 = -(1-m)*(np.log(np.linalg.det(np.linalg.inv(SD_Object.G33_d_free_inverse@SD_Object.G33d)))/2 + 2*np.log(2,dtype=np.double))
+    term2 = -(1-m)*(np.log(np.linalg.det(np.linalg.inv(SD_Object.G33_d_free_inverse@SD_Object.G33d))) + 2*np.log(2,dtype=np.double))/2
     Gdij = fields.read_G_from_Ghat(SD_Object.Ghatd, int(SD_Object.discretization/2))
     brace = m/2*Gdij['G11'] + m/2*Gdij['G22'] + (1-m)*SD_Object.G33d
     Gsqr = np.power(brace,SD_Object.q)
-    term3 = -SD_Object.Jsqr*(1/SD_Object.q - 1)*np.trace(Gsqr)/(SD_Object.discretization*2)**2/2
+    term3 = -(SD_Object.Jsqr*(1/SD_Object.q - 1)*np.trace(Gsqr)/(SD_Object.discretization*2)**2)/2
 
     return term1 + term2 + term3
 
@@ -20,11 +20,11 @@ def on_shell_action_num(SD_Object: SchwingerDyson):
     m = SD_Object.m
     arg = np.linalg.det(np.linalg.inv(SD_Object.Ghat_n_free_inverse@SD_Object.Ghatn))
     term1 = -m/4*(np.log(arg) + 2*np.log(2,dtype=np.double)) 
-    term2 = -(1-m)*(np.log(np.linalg.det(np.linalg.inv(SD_Object.G33_n_free_inverse@SD_Object.G33n)))/2 + np.log(2,dtype=np.double))
+    term2 = -(1-m)*(np.log(np.linalg.det(np.linalg.inv(SD_Object.G33_n_free_inverse@SD_Object.G33n))) + np.log(2,dtype=np.double))/2
     Gdij = fields.read_G_from_Ghat(SD_Object.Ghatn, int(SD_Object.discretization/2))
     brace = m/2*Gdij['G11'] + m/2*Gdij['G22'] + (1-m)*SD_Object.G33n
     Gsqr = np.power(brace,SD_Object.q)
-    term3 = -SD_Object.Jsqr*(1/SD_Object.q - 1)*np.trace(Gsqr)/(SD_Object.discretization*2)**2/2
+    term3 = -(SD_Object.Jsqr*(1/SD_Object.q - 1)*np.trace(Gsqr)/(SD_Object.discretization*2)**2)/2
 
     return term1 + term2 + term3
 
@@ -34,13 +34,14 @@ def charge(SD_Object: SchwingerDyson, Iden):
 
 def renyi2(Iden, Inum):
 
-    return Inum - Iden
+    print("Renyi 2 = ", Inum - Iden)
+    return (Inum - Iden)
 
 def results(SD_Object: SchwingerDyson):
 
-    Inum = on_shell_action_num(SD_Object)
-    Iden = on_shell_action_den(SD_Object)
-    I2 = renyi2(Iden, Inum)
+    Inum = (on_shell_action_num(SD_Object)).astype(np.double)
+    Iden = (on_shell_action_den(SD_Object)).astype(np.double)
+    I2 = renyi2(Iden, Inum).astype(np.double)
     Q = charge(SD_Object,Iden)
 
     return {'m': SD_Object.m, 'Inum': Inum, 'Iden': Iden, 'renyi2': I2, 'charge': Q}

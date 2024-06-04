@@ -96,11 +96,11 @@ class SchwingerDyson:
     #use first S.-D. equation to calculate Ghat and G33
     def __get_G(self, weight):
     
-        self.Ghatd = (1-weight)*self.Ghatd_old + weight*np.linalg.inv(self.Ghat_d_free_inverse.astype(np.double) - self.Sigmahatd.astype(np.double))
-        self.Ghatn = (1-weight)*self.Ghatn_old + weight*np.linalg.inv(self.Ghat_n_free_inverse.astype(np.double) - self.Sigmahatn.astype(np.double))
+        self.Ghatd = (1-weight)*self.Ghatd_old + weight*np.linalg.inv(self.Ghat_d_free_inverse.astype(np.double) - self.Sigmahatd.astype(np.complex64))
+        self.Ghatn = (1-weight)*self.Ghatn_old + weight*np.linalg.inv(self.Ghat_n_free_inverse.astype(np.double) - self.Sigmahatn.astype(np.complex64))
 
-        self.G33d = (1-weight)*self.G33d_old + weight*np.linalg.inv(self.G33_d_free_inverse.astype(np.double) - self.Sigma33d.astype(np.double))
-        self.G33n = (1-weight)*self.G33n_old + weight*np.linalg.inv(self.G33_n_free_inverse.astype(np.double) - self.Sigma33n.astype(np.double))
+        self.G33d = (1-weight)*self.G33d_old + weight*np.linalg.inv(self.G33_d_free_inverse.astype(np.double) - self.Sigma33d.astype(np.complex64))
+        self.G33n = (1-weight)*self.G33n_old + weight*np.linalg.inv(self.G33_n_free_inverse.astype(np.double) - self.Sigma33n.astype(np.complex64))
     
     #swap the labels for the old and the current matrix
     def __swap(self):

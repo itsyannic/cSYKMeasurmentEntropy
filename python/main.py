@@ -8,7 +8,7 @@ import JT_entropy
 #set plot parameters
 ms = np.linspace(0,1,10,endpoint=False, dtype=np.double)
 q = 4
-beta = 50
+beta = 50*np.sqrt(2**(q-1)/q)
 J = 1
 
 if (True):
