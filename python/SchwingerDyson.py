@@ -145,7 +145,7 @@ class SchwingerDyson:
 
         i = 1
 
-        while(old_error >= weight*self.error_threshold):
+        while(old_error >= weight**2*self.error_threshold):
 
             self.__get_Sigma()
             self.__swap()
