@@ -76,7 +76,7 @@ class SchwingerDyson:
         Sigma_d_dict = {'G11': Sigma_d11*2, 'G22': -Sigma_d11*2, 'G12': -Sigma_d11*2, 'G21': Sigma_d11*2} #Sigma12 must be mapped with the G21 map and vice versa
         #the factor of two is ther to account for the fact that the Ghat matrix has a 1/2 in front while Sigmahat does not
         #update Sigma matrices
-        self.Sigma33d = -Sigma_d11
+        self.Sigma33d = Sigma_d11 #sign flipped
         #print(max(np.amax(Sigma_d11),abs(np.amin(Sigma_d11))))
 
         self.Sigmahatd = fields.create_Sigma_hat(Sigma_d_dict,int(self.discretization/2))
@@ -89,7 +89,7 @@ class SchwingerDyson:
         Sigma_n_dict = {'G11': Sigma_n11*2, 'G22': -Sigma_n11*2, 'G12': -Sigma_n11*2, 'G21': Sigma_n11*2}
         #the factor of two is ther to account for the fact that the Ghat matrix has a 1/2 in front while Sigmahat does not
         #update Sigma matrices
-        self.Sigma33n = -Sigma_n11
+        self.Sigma33n = Sigma_n11 #sign flipped
 
         self.Sigmahatn = fields.create_Sigma_hat(Sigma_n_dict,int(self.discretization/2))
     
@@ -99,8 +99,8 @@ class SchwingerDyson:
         self.Ghatd = np.linalg.inv(self.Ghat_d_free_inverse.astype(np.double) - self.Sigmahatd.astype(np.double))
         self.Ghatn = np.linalg.inv(self.Ghat_n_free_inverse.astype(np.double) - self.Sigmahatn.astype(np.double))
 
-        self.G33d = np.linalg.inv(self.G33_d_free_inverse.astype(np.double) - self.Sigma33d.astype(np.double))
-        self.G33n = np.linalg.inv(self.G33_n_free_inverse.astype(np.double) - self.Sigma33n.astype(np.double))
+        self.G33d = np.linalg.inv(-self.G33_d_free_inverse.astype(np.double) - self.Sigma33d.astype(np.double)) #sign flipped
+        self.G33n = np.linalg.inv(-self.G33_n_free_inverse.astype(np.double) - self.Sigma33n.astype(np.double)) #sign flipped
     
     #swap the labels for the old and the current matrix
     def __swap(self):
@@ -158,13 +158,13 @@ class SchwingerDyson:
 
             error = self.__get_error()
 
-            #print(error)
+            print(error)
 
             for i in range(len(error)):
                 if error[i] > old_error[i]:
 
                     weight[i] = weight[i]/2
-                    print(weight)
+                    #print(weight)
                     #print("Weight updated at iteration step n = " + str(i) + ": x = "+ str(weight) + "\n")
 
             old_error = error
