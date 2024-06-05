@@ -16,7 +16,7 @@ if (True):
     results = []
 
     for m in ms:
-        sd = SchwingerDyson(beta,q,J,m,200,0.000001,weight=0.5,max_iter=10000)
+        sd = SchwingerDyson(beta,q,J,m,300,0.0000001,weight=0.0005,max_iter=10000)
         sd.solve()
         results.append(physics.results(sd))
         print(m)

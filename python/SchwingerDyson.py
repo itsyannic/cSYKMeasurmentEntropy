@@ -94,13 +94,13 @@ class SchwingerDyson:
         self.Sigmahatn = fields.create_Sigma_hat(Sigma_n_dict,int(self.discretization/2))
     
     #use first S.-D. equation to calculate Ghat and G33
-    def __get_G(self, weight):
+    def __get_G(self):
     
-        self.Ghatd = (1-weight)*self.Ghatd_old + weight*np.linalg.inv(self.Ghat_d_free_inverse.astype(np.double) - self.Sigmahatd.astype(np.double))
-        self.Ghatn = (1-weight)*self.Ghatn_old + weight*np.linalg.inv(self.Ghat_n_free_inverse.astype(np.double) - self.Sigmahatn.astype(np.double))
+        self.Ghatd = np.linalg.inv(self.Ghat_d_free_inverse.astype(np.double) - self.Sigmahatd.astype(np.double))
+        self.Ghatn = np.linalg.inv(self.Ghat_n_free_inverse.astype(np.double) - self.Sigmahatn.astype(np.double))
 
-        self.G33d = (1-weight)*self.G33d_old + weight*np.linalg.inv(self.G33_d_free_inverse.astype(np.double) - self.Sigma33d.astype(np.double))
-        self.G33n = (1-weight)*self.G33n_old + weight*np.linalg.inv(self.G33_n_free_inverse.astype(np.double) - self.Sigma33n.astype(np.double))
+        self.G33d = np.linalg.inv(self.G33_d_free_inverse.astype(np.double) - self.Sigma33d.astype(np.double))
+        self.G33n = np.linalg.inv(self.G33_n_free_inverse.astype(np.double) - self.Sigma33n.astype(np.double))
     
     #swap the labels for the old and the current matrix
     def __swap(self):
@@ -125,40 +125,54 @@ class SchwingerDyson:
 
         error = np.double(0)
 
-        matrices = [(self.Ghatd - self.Ghatd_old)/(self.discretization*4), (self.Ghatn - self.Ghatn_old)/(self.discretization*4), 
-                    (self.G33d-self.G33d_old)/(self.discretization*2), (self.G33n - self.G33n_old)/(self.discretization*2)]
+        matrices = [(self.Ghatd - self.Ghatd_old)/(self.discretization*4), (self.G33d-self.G33d_old)/(self.discretization*2), (self.Ghatn - self.Ghatn_old)/(self.discretization*4), (self.G33n - self.G33n_old)/(self.discretization*2)]
         
         error = [np.abs(np.trace(matrix@matrix)) for matrix in matrices]
 
-        return np.max(error)
+        return error
 
     #iteratively solve the Schinger-Dyson equations
     def solve(self):
 
-        weight = self.initial_weight
+        weight = np.zeros(4, dtype=np.double)
+        weight[:] = self.initial_weight
 
         self.__get_Sigma()
         self.__swap()
-        self.__get_G(weight)
+        self.__get_G()
 
         old_error = self.__get_error()
 
+        self.Ghatd = (1-weight[0])*self.Ghatd_old + weight[0]*self.Ghatd
+        self.G33d = (1-weight[1])*self.G33d_old + weight[1]*self.G33d
+        self.Ghatn = (1-weight[2])*self.Ghatn_old + weight[2]*self.Ghatn
+        self.G33n = (1-weight[3])*self.G33n_old + weight[3]*self.G33n
+
         i = 1
 
-        while(old_error >= weight**2*self.error_threshold):
+        while(np.max(old_error) >= self.error_threshold):
 
             self.__get_Sigma()
             self.__swap()
-            self.__get_G(weight)
+            self.__get_G()
 
             error = self.__get_error()
-            print(error/weight**2)
 
-            if error > old_error:
-                weight = weight/2
-                #print("Weight updated at iteration step n = " + str(i) + ": x = "+ str(weight) + "\n")
+            #print(error)
+
+            for i in range(len(error)):
+                if error[i] > old_error[i]:
+
+                    weight[i] = weight[i]/2
+                    print(weight)
+                    #print("Weight updated at iteration step n = " + str(i) + ": x = "+ str(weight) + "\n")
 
             old_error = error
+
+            self.Ghatd = (1-weight[0])*self.Ghatd_old + weight[0]*self.Ghatd
+            self.G33d = (1-weight[1])*self.G33d_old + weight[1]*self.G33d
+            self.Ghatn = (1-weight[2])*self.Ghatn_old + weight[2]*self.Ghatn
+            self.G33n = (1-weight[3])*self.G33n_old + weight[3]*self.G33n
 
             i += 1
 
