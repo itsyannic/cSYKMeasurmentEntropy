@@ -30,7 +30,7 @@ class SchwingerDyson:
 
         self.error_threshold = np.double(error_threshold)
         self.initial_weight = np.double(weight)
-        self.__normalization = np.power(self.beta/self.discretization,2)
+        self.normalization = np.power(self.beta/self.discretization,2)
         self.iter_count = 0
 
         self.init_matrices()
@@ -72,7 +72,7 @@ class SchwingerDyson:
         Gdij = fields.read_G_from_Ghat(self.Ghatd, int(self.discretization/2))
 
         brace = self.m/4*(-Gdij['G11'] + Gdij['G22'] - Gdij['G12'] + Gdij['G21']) + (1-self.m)*self.G33d
-        Sigma_d11 = -self.__normalization*self.Jsqr*np.multiply(np.power(brace,self.q/2), np.power(np.transpose(brace),self.q/2-1))
+        Sigma_d11 = -self.normalization*self.Jsqr*np.multiply(np.power(brace,self.q/2), np.power(np.transpose(brace),self.q/2-1))
         Sigma_d_dict = {'G11': Sigma_d11*2, 'G22': -Sigma_d11*2, 'G12': -Sigma_d11*2, 'G21': Sigma_d11*2} #Sigma12 must be mapped with the G21 map and vice versa
         #the factor of two is ther to account for the fact that the Ghat matrix has a 1/2 in front while Sigmahat does not
         #update Sigma matrices
@@ -85,7 +85,7 @@ class SchwingerDyson:
         Gnij = fields.read_G_from_Ghat(self.Ghatn, int(self.discretization/2))
 
         brace = self.m/4*(-Gnij['G11'] + Gnij['G22'] -Gnij['G12'] + Gnij['G21']) + (1-self.m)*self.G33n
-        Sigma_n11 = -self.__normalization*self.Jsqr*np.multiply(np.power(brace,self.q/2), np.power(np.transpose(brace),self.q/2-1))
+        Sigma_n11 = -self.normalization*self.Jsqr*np.multiply(np.power(brace,self.q/2), np.power(np.transpose(brace),self.q/2-1))
         Sigma_n_dict = {'G11': Sigma_n11*2, 'G22': -Sigma_n11*2, 'G12': -Sigma_n11*2, 'G21': Sigma_n11*2}
         #the factor of two is ther to account for the fact that the Ghat matrix has a 1/2 in front while Sigmahat does not
         #update Sigma matrices
