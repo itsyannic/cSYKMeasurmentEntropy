@@ -6,10 +6,10 @@ import physics
 import JT_entropy
 
 #set plot parameters
-#ms = np.linspace(0,1,10,endpoint=False, dtype=np.double)
-ms = [0]
+ms = np.linspace(0,1,10,endpoint=False, dtype=np.double)
+#ms = [0]
 q = 4
-beta = 100
+beta = 1000
 J = 1
 
 if (True):
@@ -34,6 +34,7 @@ else:
     input = file.read()
     results = json.loads(input)['data']
     file.close()
+
 
 #plot data
 m = [point['m'] for point in results]

@@ -99,8 +99,8 @@ class SchwingerDyson:
         self.Ghatd = np.linalg.inv(self.Ghat_d_free_inverse.astype(np.double) - self.Sigmahatd.astype(np.double))
         self.Ghatn = np.linalg.inv(self.Ghat_n_free_inverse.astype(np.double) - self.Sigmahatn.astype(np.double))
 
-        self.G33d = np.linalg.inv(-self.G33_d_free_inverse.astype(np.double) - self.Sigma33d.astype(np.double)) #sign flipped
-        self.G33n = np.linalg.inv(-self.G33_n_free_inverse.astype(np.double) - self.Sigma33n.astype(np.double)) #sign flipped
+        self.G33d = np.linalg.inv(self.G33_d_free_inverse.astype(np.double) - self.Sigma33d.astype(np.double)) 
+        self.G33n = np.linalg.inv(self.G33_n_free_inverse.astype(np.double) - self.Sigma33n.astype(np.double)) 
     
     #swap the labels for the old and the current matrix
     def __swap(self):

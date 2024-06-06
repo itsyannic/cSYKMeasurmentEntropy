@@ -47,3 +47,5 @@ def S_gen(Q,m,q,beta,J):
 
     else:
         return np.minimum(_S_UV(m), _S_IR(Q,m,q,beta,J))
+    
+print(_S_IR(0,0,4,1000,1))
