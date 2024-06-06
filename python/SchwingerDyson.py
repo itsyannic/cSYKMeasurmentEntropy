@@ -35,11 +35,11 @@ class SchwingerDyson:
 
         self.init_matrices()
 
-        self.Ghat_d_free_inverse = np.linalg.inv(self.Ghatd)
-        self.Ghat_n_free_inverse = np.linalg.inv(self.Ghatn)
+        self.Ghat_d_free_inverse = np.linalg.inv(self.Ghatd*self.normalization)
+        self.Ghat_n_free_inverse = np.linalg.inv(self.Ghatn*self.normalization)
 
-        self.G33_d_free_inverse = np.linalg.inv(self.G33d)
-        self.G33_n_free_inverse = np.linalg.inv(self.G33n)
+        self.G33_d_free_inverse = np.linalg.inv(self.G33d*self.normalization)
+        self.G33_n_free_inverse = np.linalg.inv(self.G33n*self.normalization)
 
     def init_matrices(self):
 
@@ -73,7 +73,7 @@ class SchwingerDyson:
 
         brace = self.m/4*(-Gdij['G11'] + Gdij['G22'] - Gdij['G12'] + Gdij['G21']) + (1-self.m)*self.G33d
         Sigma_d11 = -self.normalization*self.Jsqr*np.multiply(np.power(brace,self.q/2), np.power(np.transpose(brace),self.q/2-1))
-        Sigma_d_dict = {'G11': Sigma_d11*2, 'G22': -Sigma_d11*2, 'G12': -Sigma_d11*2, 'G21': Sigma_d11*2} #Sigma12 must be mapped with the G21 map and vice versa
+        Sigma_d_dict = {'G11': -Sigma_d11*2, 'G22': Sigma_d11*2, 'G12': Sigma_d11*2, 'G21': -Sigma_d11*2} #Sigma12 must be mapped with the G21 map and vice versa
         #the factor of two is ther to account for the fact that the Ghat matrix has a 1/2 in front while Sigmahat does not
         #update Sigma matrices
         self.Sigma33d = Sigma_d11 #sign flipped
@@ -86,7 +86,7 @@ class SchwingerDyson:
 
         brace = self.m/4*(-Gnij['G11'] + Gnij['G22'] -Gnij['G12'] + Gnij['G21']) + (1-self.m)*self.G33n
         Sigma_n11 = -self.normalization*self.Jsqr*np.multiply(np.power(brace,self.q/2), np.power(np.transpose(brace),self.q/2-1))
-        Sigma_n_dict = {'G11': Sigma_n11*2, 'G22': -Sigma_n11*2, 'G12': -Sigma_n11*2, 'G21': Sigma_n11*2}
+        Sigma_n_dict = {'G11': -Sigma_n11*2, 'G22': Sigma_n11*2, 'G12': Sigma_n11*2, 'G21': -Sigma_n11*2}
         #the factor of two is ther to account for the fact that the Ghat matrix has a 1/2 in front while Sigmahat does not
         #update Sigma matrices
         self.Sigma33n = Sigma_n11 #sign flipped
@@ -129,12 +129,12 @@ class SchwingerDyson:
         
         error = [np.abs(np.trace(matrix@matrix)) for matrix in matrices]
 
-        return error
+        return [np.maximum(error[0],error[1]), np.max(error[2]+error[3])]
 
     #iteratively solve the Schinger-Dyson equations
     def solve(self):
 
-        weight = np.zeros(4, dtype=np.double)
+        weight = np.zeros(2, dtype=np.double)
         weight[:] = self.initial_weight
 
         self.__get_Sigma()
@@ -144,9 +144,9 @@ class SchwingerDyson:
         old_error = self.__get_error()
 
         self.Ghatd = (1-weight[0])*self.Ghatd_old + weight[0]*self.Ghatd
-        self.G33d = (1-weight[1])*self.G33d_old + weight[1]*self.G33d
-        self.Ghatn = (1-weight[2])*self.Ghatn_old + weight[2]*self.Ghatn
-        self.G33n = (1-weight[3])*self.G33n_old + weight[3]*self.G33n
+        self.G33d = (1-weight[0])*self.G33d_old + weight[0]*self.G33d
+        self.Ghatn = (1-weight[1])*self.Ghatn_old + weight[1]*self.Ghatn
+        self.G33n = (1-weight[1])*self.G33n_old + weight[1]*self.G33n
 
         i = 1
 
@@ -170,9 +170,9 @@ class SchwingerDyson:
             old_error = error
 
             self.Ghatd = (1-weight[0])*self.Ghatd_old + weight[0]*self.Ghatd
-            self.G33d = (1-weight[1])*self.G33d_old + weight[1]*self.G33d
-            self.Ghatn = (1-weight[2])*self.Ghatn_old + weight[2]*self.Ghatn
-            self.G33n = (1-weight[3])*self.G33n_old + weight[3]*self.G33n
+            self.G33d = (1-weight[0])*self.G33d_old + weight[0]*self.G33d
+            self.Ghatn = (1-weight[1])*self.Ghatn_old + weight[1]*self.Ghatn
+            self.G33n = (1-weight[1])*self.G33n_old + weight[1]*self.G33n
 
             i += 1
 

@@ -29,7 +29,7 @@ def on_shell_action_num(SD_Object: SchwingerDyson):
     return term1 + term2 + term3
 
 def charge(SD_Object: SchwingerDyson, Iden):
-
+    return -SD_Object.m/2
     return SD_Object.m/2 + np.exp(Iden)*(1-SD_Object.m)*np.trace(SD_Object.G33n)/(SD_Object.discretization*2) #?
 
 def renyi2(Iden, Inum):

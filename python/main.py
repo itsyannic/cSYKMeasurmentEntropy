@@ -7,9 +7,9 @@ import JT_entropy
 
 #set plot parameters
 ms = np.linspace(0,1,10,endpoint=False, dtype=np.double)
-#ms = [0]
+#ms = [0.0]
 q = 4
-beta = 1000
+beta = 50
 J = 1
 
 if (True):
@@ -17,7 +17,7 @@ if (True):
     results = []
 
     for m in ms:
-        sd = SchwingerDyson(beta,q,J,m,100,0.000001,weight=0.05,max_iter=10000)
+        sd = SchwingerDyson(beta,q,J,m,100,0.0001,weight=0.05,max_iter=10000)
         sd.solve()
         results.append(physics.results(sd))
         print(m)

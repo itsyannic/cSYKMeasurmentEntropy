@@ -42,10 +42,10 @@ def _S_UV(m):
 
 def S_gen(Q,m,q,beta,J):
 
-    if (m > 0.3):
+    if (m > 0.0):
         return _S_UV(m)
 
     else:
         return np.minimum(_S_UV(m), _S_IR(Q,m,q,beta,J))
     
-print(_S_IR(0,0,4,1000,1))
+print(_S_IR(0,0,4,100,1))
