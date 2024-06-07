@@ -35,11 +35,18 @@ class SchwingerDyson:
 
         self.init_matrices()
 
-        self.Ghat_d_free_inverse = np.linalg.inv(self.Ghatd*self.normalization)
-        self.Ghat_n_free_inverse = np.linalg.inv(self.Ghatn*self.normalization)
+        self.Ghatd = self.Ghatd*self.normalization
+        self.Ghatn = self.Ghatn*self.normalization
 
-        self.G33_d_free_inverse = np.linalg.inv(self.G33d*self.normalization)
-        self.G33_n_free_inverse = np.linalg.inv(self.G33n*self.normalization)
+        self.G33d = self.G33d*self.normalization
+        self.G33n = self.G33n*self.normalization
+
+
+        self.Ghat_d_free_inverse = np.linalg.inv(self.Ghatd)
+        self.Ghat_n_free_inverse = np.linalg.inv(self.Ghatn)
+
+        self.G33_d_free_inverse = np.linalg.inv(self.G33d)
+        self.G33_n_free_inverse = np.linalg.inv(self.G33n)
 
     def init_matrices(self):
 
