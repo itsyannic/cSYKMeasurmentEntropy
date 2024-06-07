@@ -6,19 +6,27 @@ import physics
 import JT_entropy
 
 #set plot parameters
-ms = np.linspace(0,1,20,endpoint=False, dtype=np.double)
+ms = np.linspace(0,0.5,20,endpoint=False, dtype=np.double)
 #ms = [0.0]
 q = 4
-beta = 100
+beta = 120
+N = 400
+steps = 0
+target_beta = 80
 J = 1
 
+
 if (True):
+    sd = SchwingerDyson(beta,q,J,0,N,0.00001,weight=0.5,max_iter=10000)
     #generate numerical data
     results = []
 
     for m in ms:
-        sd = SchwingerDyson(beta,q,J,m,400,0.000001,weight=0.5,max_iter=10000)
+        sd.m = m
         sd.solve()
+        for i in range(steps):
+            sd._beta = beta + (target_beta-beta)*(i/steps)
+            sd.solve()
         results.append(physics.results(sd))
         print(m)
         print(results[-1]['renyi2'])
@@ -46,5 +54,5 @@ plt.scatter(m,I)
 plt.plot(m,JT)
 plt.xlabel('Charge Q')
 plt.ylabel('Renyi-2 Entropy I2')
-plt.title('beta = ' + str(beta) + ', q=' + str(q))
+plt.title('beta = ' + str(target_beta) + ', q=' + str(q))
 plt.show()

@@ -6,7 +6,7 @@ class SchwingerDyson:
     def __init__(self, beta, q, J, m, discretization, error_threshold, weight=0.05, max_iter=1000):
 
         self.q = np.double(q)
-        self.beta = np.double(beta)
+        self._beta = np.double(beta)
         self.J = np.double(J)
         self.Jsqr = np.double(J**2)
         self.m = np.double(m)
@@ -30,11 +30,18 @@ class SchwingerDyson:
 
         self.error_threshold = np.double(error_threshold)
         self.initial_weight = np.double(weight)
-        self.normalization = np.power(self.beta/self.discretization,2)
+        self.normalization = np.power(self._beta/self.discretization,2)
         self.iter_count = 0
 
         self.init_matrices()
 
+        self.Ghatdfree = self.Ghatd
+        self.Ghatnfree = self.Ghatn
+
+        self.G33dfree = self.G33d
+        self.G33nfree = self.G33n
+
+        
         self.Ghatd = self.Ghatd*self.normalization
         self.Ghatn = self.Ghatn*self.normalization
 
@@ -47,6 +54,23 @@ class SchwingerDyson:
 
         self.G33_d_free_inverse = np.linalg.inv(self.G33d)
         self.G33_n_free_inverse = np.linalg.inv(self.G33n)
+
+    @property
+    def beta(self):
+        return self._beta
+    
+    @beta.setter
+    def beta(self, input):
+        self._beta = input
+
+        self.Ghat_d_free_inverse = np.linalg.inv(self.Ghatdfree )
+        self.Ghat_n_free_inverse = np.linalg.inv(self.Ghatnfree)
+
+        self.G33_d_free_inverse = np.linalg.inv(self.G33dfree)
+        self.G33_n_free_inverse = np.linalg.inv(self.G33nfree)
+
+        self.normalization = np.power(self._beta/self.discretization,2)
+
 
     def init_matrices(self):
 
