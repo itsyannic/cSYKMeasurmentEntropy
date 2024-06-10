@@ -177,9 +177,9 @@ class SchwingerDyson:
     
     def __get_error2(self, G33, Ghat, G33_old, Ghat_old):
 
-        matrices = [(Ghat - Ghat_old)/(self.discretization*4), (G33-G33_old)/(self.discretization*2)]
-        error = [np.abs(np.trace(matrix@matrix)) for matrix in matrices]
-        return np.maximum(error[0], error[1])
+        matrices = [(Ghat - Ghat_old), (G33-G33_old)]
+        error = [np.abs(np.trace(matrix@matrix))*self.discretization for matrix in matrices]
+        return error[0] + error[1]
 
     #iteratively solve the Schinger-Dyson equations
     def solve(self):
@@ -286,7 +286,7 @@ class SchwingerDyson:
                 error[1] = self.__get_error2(self.G33n,self.Ghatn,self.G33n_old,self.Ghatn_old)
                 if (error[1] > old_error[1]):
                     weight[1] = weight[1]/2
-                if (abs(old_error[1] - error[1]) < 1e-10*self.error_threshold ):
+                if (abs(old_error[1] - error[1]) < 1e-6*error[1]):
                     print("Reset weight for numerator.\n")
                     weight[1] = self.initial_weight
                 self.Ghatn = (1-weight[1])*self.Ghatn_old + weight[1]*self.Ghatn
@@ -300,7 +300,7 @@ class SchwingerDyson:
                 error[0] = self.__get_error2(self.G33d,self.Ghatd,self.G33d_old,self.Ghatd_old)
                 if (error[0] > old_error[0]):
                     weight[0] = weight[0]/2
-                if (abs(old_error[0] - error[0]) < 1e-10*self.error_threshold ):
+                if (abs(old_error[0] - error[0]) < 1e-6*error[0] ):
                     print("Reset weight for denominator.\n")
                     weight[0] = self.initial_weight
                 self.Ghatd = (1-weight[0])*self.Ghatd_old + weight[0]*self.Ghatd
