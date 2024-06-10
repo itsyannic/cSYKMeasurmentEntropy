@@ -41,14 +41,6 @@ class SchwingerDyson:
         self.G33dfree = self.G33d
         self.G33nfree = self.G33n
 
-        
-        self.Ghatd = self.Ghatd*self.normalization
-        self.Ghatn = self.Ghatn*self.normalization
-
-        self.G33d = self.G33d*self.normalization
-        self.G33n = self.G33n*self.normalization
-
-
         self.Ghat_d_free_inverse = np.linalg.inv(self.Ghatd)
         self.Ghat_n_free_inverse = np.linalg.inv(self.Ghatn)
 

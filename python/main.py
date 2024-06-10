@@ -6,10 +6,10 @@ import physics
 import JT_entropy
 
 #set plot parameters
-ms = np.linspace(0,0.5,20,endpoint=False, dtype=np.double)
-#ms = [0.0]
+#ms = np.linspace(0,0.5,20,endpoint=False, dtype=np.double)
+ms = [0.0]
 q = 4
-beta = 120
+beta = 200
 N = 400
 steps = 0
 target_beta = 80
@@ -17,7 +17,7 @@ J = 1
 
 
 if (True):
-    sd = SchwingerDyson(beta,q,J,0,N,0.00001,weight=0.5,max_iter=10000)
+    sd = SchwingerDyson(beta,q,J,0,N,0.00000001,weight=0.5,max_iter=10000)
     #generate numerical data
     results = []
 
@@ -29,6 +29,7 @@ if (True):
             sd.solve()
         results.append(physics.results(sd))
         print(m)
+        print(JT_entropy.S_IR(0,0,q,beta,J))
         print(results[-1]['renyi2'])
 
     #save data to file
