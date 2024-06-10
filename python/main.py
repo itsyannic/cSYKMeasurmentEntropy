@@ -11,12 +11,12 @@ q = 4
 beta = 100
 J = 1
 
-if (False):
+if (True):
     #generate numerical data
     results = []
 
     for m in ms:
-        sd = SchwingerDyson(beta,q,J,m,200,0.000001,weight=0.000005,max_iter=10000)
+        sd = SchwingerDyson(beta,q,J,m,200,0.000001,weight=0.5,max_iter=10000)
         sd.solve()
         results.append(physics.results(sd))
         print(m)
