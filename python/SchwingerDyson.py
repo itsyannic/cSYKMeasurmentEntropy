@@ -32,6 +32,7 @@ class SchwingerDyson:
         self.initial_weight = np.double(weight)
         self.normalization = np.power(self._beta/self.discretization,2)
         self.iter_count = 0
+        self.didconverge = [False,False]
 
         self.init_matrices()
 
@@ -53,14 +54,8 @@ class SchwingerDyson:
     
     @beta.setter
     def beta(self, input):
+
         self._beta = input
-
-        self.Ghat_d_free_inverse = np.linalg.inv(self.Ghatdfree )
-        self.Ghat_n_free_inverse = np.linalg.inv(self.Ghatnfree)
-
-        self.G33_d_free_inverse = np.linalg.inv(self.G33dfree)
-        self.G33_n_free_inverse = np.linalg.inv(self.G33nfree)
-
         self.normalization = np.power(self._beta/self.discretization,2)
 
 
@@ -160,7 +155,7 @@ class SchwingerDyson:
         
         error = [np.abs(np.trace(matrix@matrix)) for matrix in matrices]
 
-        return [np.maximum(error[0],error[1]), np.max(error[2]+error[3])]
+        return np.array([np.maximum(error[0],error[1]), np.max(error[2]+error[3])])
 
     #iteratively solve the Schinger-Dyson equations
     def solve(self):
@@ -181,7 +176,11 @@ class SchwingerDyson:
 
         i = 1
 
-        while(np.max(old_error) >= self.error_threshold):
+        while(True):
+
+            self.didconverge = (old_error <= self.error_threshold)
+            if (all(self.didconverge)):
+                break
 
             self.__get_Sigma()
             self.__swap()
@@ -189,14 +188,17 @@ class SchwingerDyson:
 
             error = self.__get_error()
 
-            print(error)
+            print(str(i)+ ". " +str(error))
 
-            for i in range(len(error)):
-                if error[i] > old_error[i]:
+            for j in range(len(error)):
+                if error[j] > old_error[j]:
+                    
+                    weight[j] = weight[j]/2
 
-                    weight[i] = weight[i]/2
-                    #print(weight)
-                    #print("Weight updated at iteration step n = " + str(i) + ": x = "+ str(weight) + "\n")
+            if (all(np.abs(old_error-error) < 1e-10*self.error_threshold)):
+                print(np.abs(old_error-error))
+                print("Error changerate below threshold. Resetting weight.\n")
+                weight[:] = self.initial_weight
 
             old_error = error
 
