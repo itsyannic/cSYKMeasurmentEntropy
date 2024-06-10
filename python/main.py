@@ -10,15 +10,15 @@ generate_data = True
 ms = np.linspace(0,1.0,20,endpoint=False, dtype=np.double)
 #ms = [0.325]
 q = 4
-beta = 100
-N = 400
+beta = 20
+N = 100
 J = 1
 
 
 if (generate_data):
     
     #generate numerical data
-    sd = SchwingerDyson(beta,q,J,0,N,0.00000001,weight=0.5,max_iter=5000)
+    sd = SchwingerDyson(beta,q,J,0,N,0.000000001,weight=0.5,max_iter=5000)
     results = []
 
     for m in ms:
@@ -55,4 +55,4 @@ plt.plot(m,JT)
 plt.xlabel('Charge Q')
 plt.ylabel('Renyi-2 Entropy I2')
 plt.title('beta = ' + str(beta) + ', q=' + str(q))
-plt.show()
+plt.savefig('beta=' + str(beta) + 'q=' + str(q) + '.jpg')
