@@ -6,6 +6,7 @@ import physics
 import JT_entropy
 
 #set plot parameters
+generate_data = True
 ms = np.linspace(0,1.0,20,endpoint=False, dtype=np.double)
 #ms = [0.325]
 q = 4
@@ -14,18 +15,16 @@ N = 400
 J = 1
 
 
-if (True):
+if (generate_data):
     
     #generate numerical data
-    sd = SchwingerDyson(beta,q,J,0,N,0.00000001,weight=0.5,max_iter=1000)
+    sd = SchwingerDyson(beta,q,J,0,N,0.00000001,weight=0.5,max_iter=5000)
     results = []
 
     for m in ms:
         sd.reset()
         sd.m = m
-        sd.solve()
-        while(not all(sd.didconverge)):
-            sd.solve()
+        sd.solve2()
 
         results.append(physics.results(sd))
         print(m)
