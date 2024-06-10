@@ -88,6 +88,14 @@ class SchwingerDyson:
                 else:
                     self.Ghatd[i,j] = 0
 
+    def reset(self):
+
+        self.Ghatd = self.Ghatdfree
+        self.Ghatn = self.Ghatnfree
+
+        self.G33d = self.G33dfree
+        self.G33n = self.G33nfree
+
     #Calculate Gijs from Ghat, use second S.-D. equation to calculate Sigma_ijs and then calculate Sigma_hat
     def __get_Sigma(self):
         
