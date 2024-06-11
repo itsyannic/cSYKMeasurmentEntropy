@@ -34,17 +34,17 @@ def S_IR(Qin,m,q,beta,J):
 
     return _S_Gauge(Q,q,betaJ,e) + _S_Gravity(Q,q,betaJ,e) + _S_0(Q,q,e) -m*2*np.log(2.0)/12.0
 
-def S_UV(m):
+def S_UV(m,q):
 
     k = 1-m
 
-    return k*(np.log(2)-1/16.0*(np.arcsin(k**(3/2)))**2)
+    return k*(np.log(2)-1/q**2*(np.arcsin(k**(3/2)))**2)
 
 def S_gen(Q,m,q,beta,J):
 
     if (m > 1.0):
-        return S_UV(m)
+        return S_UV(m,q)
 
     else:
-        return np.minimum(S_UV(m), S_IR(Q,m,q,beta,J))
+        return np.minimum(S_UV(m,q), S_IR(Q,m,q,beta,J))
     

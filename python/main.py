@@ -7,18 +7,18 @@ import JT_entropy
 
 #set plot parameters
 generate_data = True
-ms = np.linspace(0,1.0,20,endpoint=False, dtype=np.double)
+ms = np.linspace(0,1.0,10,endpoint=False, dtype=np.double)
 #ms = [0.325]
 q = 4
-beta = 100
-N = 500
+beta = 50
+N = 200
 J = 1
 
 
 if (generate_data):
     
     #generate numerical data
-    sd = SchwingerDyson(beta,q,J,0,N,0.00001,weight=0.5,max_iter=5000)
+    sd = SchwingerDyson(beta,q,J,0,N,0.0000001,weight=0.5,max_iter=10000)
     results = []
 
     for m in ms:
@@ -28,7 +28,7 @@ if (generate_data):
 
         results.append(physics.results(sd))
         print(m)
-        print(JT_entropy.S_IR(0,m,q,beta,J))
+        print(JT_entropy.S_gen(0,m,q,beta,J))
         print(results[-1]['renyi2'])
 
     #save data to file
