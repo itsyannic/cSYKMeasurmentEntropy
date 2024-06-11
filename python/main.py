@@ -18,7 +18,7 @@ J = 1
 if (generate_data):
     
     #generate numerical data
-    sd = SchwingerDyson(beta,q,J,0,N,0.0000001,weight=0.5,max_iter=10000)
+    sd = SchwingerDyson(beta,q,J,0,N,0.0001,weight=0.5,max_iter=5000)
     results = []
 
     for m in ms:
@@ -27,9 +27,7 @@ if (generate_data):
         sd.solve2()
 
         results.append(physics.results(sd))
-        print(m)
-        print(JT_entropy.S_gen(0,m,q,beta,J))
-        print(results[-1]['renyi2'])
+        print(str(m) + ": S_JT=" +str(JT_entropy.S_gen(0,m,q,beta,J)) + ", S_cSYK=" + str(results[-1]['renyi2']))
 
     #save data to file
     param = {'q': q, 'beta': beta, 'J': J, 'data': results}
