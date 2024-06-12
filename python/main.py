@@ -8,17 +8,19 @@ import JT_entropy
 #set plot parameters
 generate_data = True
 ms = np.linspace(0,1.0,10,endpoint=False, dtype=np.double)
-#ms = [0.325]
-q = 4
+#ms = [0.7]
+q = 8
 beta = 50
-N = 200
+N = 500
+L = 0.0000001
 J = 1
 
+filebase = 'beta=' + str(beta) + 'q=' + str(q) + 'N=' +str(N)
 
 if (generate_data):
     
     #generate numerical data
-    sd = SchwingerDyson(beta,q,J,0,N,0.0001,weight=0.5,max_iter=5000)
+    sd = SchwingerDyson(beta,q,J,0,N,L,weight=0.5,max_iter=5000)
     results = []
 
     for m in ms:
@@ -27,16 +29,16 @@ if (generate_data):
         sd.solve2()
 
         results.append(physics.results(sd))
-        print(str(m) + ": S_JT=" +str(JT_entropy.S_gen(0,m,q,beta,J)) + ", S_cSYK=" + str(results[-1]['renyi2']))
+        print(str(m) + ": S_JT=" +str(JT_entropy.S_gen(results[-1]['charge'],m,q,beta,J)) + ", S_cSYK=" + str(results[-1]['renyi2']))
 
     #save data to file
-    param = {'q': q, 'beta': beta, 'J': J, 'data': results}
+    param = {'q': q, 'beta': beta, 'J': J, 'N': N, 'L': L, 'data': results}
     json_obj = json.dumps(param)
-    output = open("data.out", "w")
+    output = open(filebase + '_data.out', "w")
     output.write(json_obj)
     output.close()
 else:
-    file = open("data.out", "r")
+    file = open(filebase + '_data.out', "r")
     input = file.read()
     results = json.loads(input)['data']
     file.close()
@@ -45,12 +47,14 @@ else:
 #plot data
 m = [point['m'] for point in results]
 I = [point['renyi2'] for point in results]
+x = np.linspace(0,1,50, endpoint=False)
 JT = [JT_entropy.S_gen(point['charge'],point['m'],q,beta,J) for point in results]
 
 
 plt.scatter(m,I)
 plt.plot(m,JT)
-plt.xlabel('Charge Q')
+plt.xlabel('m')
 plt.ylabel('Renyi-2 Entropy I2')
 plt.title('beta = ' + str(beta) + ', q=' + str(q))
-plt.savefig('beta=' + str(beta) + 'q=' + str(q) + '.jpg')
+#plt.show()
+plt.savefig(filebase + '.jpg')

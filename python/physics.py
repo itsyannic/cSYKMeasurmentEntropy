@@ -28,9 +28,13 @@ def on_shell_action_num(SD_Object: SchwingerDyson):
 
     return term1 + term2 + term3
 
-def charge(SD_Object: SchwingerDyson, Iden):
-    return -SD_Object.m/2
-    return SD_Object.m/2 + np.exp(Iden)*(1-SD_Object.m)*np.trace(SD_Object.G33n)/(SD_Object.discretization*2) #?
+def trG33(SD_Object: SchwingerDyson):
+    return np.trace(SD_Object.G33n)
+
+def charge(SD_Object: SchwingerDyson, Inum, trG):
+    #print((1-SD_Object.m)*np.trace(SD_Object.G33n))
+    #return -SD_Object.m/2
+    return SD_Object.m/2  + (1-SD_Object.m)*trG*SD_Object.normalization*np.exp(Inum) #?
 
 def renyi2(Iden, Inum):
 
@@ -40,7 +44,8 @@ def results(SD_Object: SchwingerDyson):
 
     Inum = on_shell_action_num(SD_Object)
     Iden = on_shell_action_den(SD_Object)
+    trG = trG33(SD_Object)
     I2 = renyi2(Iden, Inum)
-    Q = charge(SD_Object,Iden)
+    Q = charge(SD_Object,Inum,trG)
 
-    return {'m': SD_Object.m, 'Inum': Inum, 'Iden': Iden, 'renyi2': I2, 'charge': Q}
+    return {'m': SD_Object.m, 'Inum': Inum, 'Iden': Iden, 'renyi2': I2, 'charge': Q, 'tr(G33)': trG}
