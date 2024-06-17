@@ -7,15 +7,15 @@ import JT_entropy
 
 #set plot parameters
 generate_data = True
-#ms = np.linspace(0,1.0,10,endpoint=False, dtype=np.double)
-ms = [0.65]
+ms = np.linspace(0,1.0,10,endpoint=False, dtype=np.double)
+#ms = [0.65]
 q = 4
 beta = 50
 N = 200
 L = 0.0000001
 J = 1
 
-filebase = 'beta=' + str(beta) + 'q=' + str(q) + 'N=' +str(N)
+filebase = 'Data/beta=' + str(beta) + 'q=' + str(q) + 'N=' +str(N)
 
 if (generate_data):
     

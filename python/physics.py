@@ -34,7 +34,7 @@ def trG33(SD_Object: SchwingerDyson):
 def charge(SD_Object: SchwingerDyson, Iden, trG):
     #print((1-SD_Object.m)*np.trace(SD_Object.G33n))
     #return -SD_Object.m/2
-    return SD_Object.m/2  - (1-SD_Object.m)*trG*np.exp(Iden) #?
+    return SD_Object.m/2  - (1-SD_Object.m)*trG #?
 
 def renyi2(Iden, Inum):
 
