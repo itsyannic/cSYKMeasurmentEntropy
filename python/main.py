@@ -7,11 +7,11 @@ import JT_entropy
 
 #set plot parameters
 generate_data = True
-ms = np.linspace(0,1.0,10,endpoint=False, dtype=np.double)
-#ms = [0.7]
-q = 8
+#ms = np.linspace(0,1.0,10,endpoint=False, dtype=np.double)
+ms = [0.65]
+q = 4
 beta = 50
-N = 500
+N = 200
 L = 0.0000001
 J = 1
 
@@ -20,7 +20,7 @@ filebase = 'beta=' + str(beta) + 'q=' + str(q) + 'N=' +str(N)
 if (generate_data):
     
     #generate numerical data
-    sd = SchwingerDyson(beta,q,J,0,N,L,weight=0.5,max_iter=5000)
+    sd = SchwingerDyson(beta,q,J,0,N,L,weight=0.5,max_iter=5000, silent=True)
     results = []
 
     for m in ms:
@@ -29,7 +29,7 @@ if (generate_data):
         sd.solve2()
 
         results.append(physics.results(sd))
-        print(str(m) + ": S_JT=" +str(JT_entropy.S_gen(results[-1]['charge'],m,q,beta,J)) + ", S_cSYK=" + str(results[-1]['renyi2']))
+        print(str(m) + ": S_JT=" +str(JT_entropy.S_gen(results[-1]['charge'],m,q,beta,J)) + ", S_cSYK=" + str(results[-1]['renyi2']) + ",  tr(G33)=" + str(results[-1]['trG33']))
 
     #save data to file
     param = {'q': q, 'beta': beta, 'J': J, 'N': N, 'L': L, 'data': results}
