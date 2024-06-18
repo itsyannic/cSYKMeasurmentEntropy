@@ -94,7 +94,7 @@ class SchwingerDyson:
 
     #Calculate Gijs from Ghat, use second S.-D. equation to calculate Sigma_ijs and then calculate Sigma_hat
     
-    def __get_Sigma2(self, G33, Ghat):
+    def __get_Sigma(self, G33, Ghat):
 
         Gdij = fields.read_G_from_Ghat(Ghat, int(self.discretization/2))
 
@@ -107,20 +107,20 @@ class SchwingerDyson:
     
     #use first S.-D. equation to calculate Ghat and G33
 
-    def __get_G2(self, Sigma33, Sigmahat, G33free_inv, Ghatfree_inv):
+    def __get_G(self, Sigma33, Sigmahat, G33free_inv, Ghatfree_inv):
 
         Ghat = np.linalg.inv(Ghatfree_inv.astype(np.double) - Sigmahat.astype(np.double))
         G33 = np.linalg.inv(G33free_inv.astype(np.double) - Sigma33.astype(np.double))
 
         return G33, Ghat
     
-    def __get_error2(self, G33, Ghat, G33_old, Ghat_old):
+    def __get_error(self, G33, Ghat, G33_old, Ghat_old):
 
         matrices = [(Ghat - Ghat_old), (G33-G33_old)]
         error = [np.abs(np.trace(matrix@matrix))*self.normalization for matrix in matrices]
         return error[0] + error[1]
 
-    def solve2(self):
+    def solve(self):
         
         error = np.zeros(2, dtype=np.double)
         old_error = np.zeros(2, dtype=np.double)
@@ -128,20 +128,20 @@ class SchwingerDyson:
         weight[:] = self.initial_weight
 
         #numerator
-        self.Sigma33n, self.Sigmahatn = self.__get_Sigma2(self.G33n,self.Ghatn)
+        self.Sigma33n, self.Sigmahatn = self.__get_Sigma(self.G33n,self.Ghatn)
         self.G33n_old = self.G33n
         self.Ghatn_old = self.Ghatn
-        self.G33n, self.Ghatn = self.__get_G2(self.Sigma33n, self.Sigmahatn, self.G33_n_free_inverse, self.Ghat_n_free_inverse)
-        old_error[1] = self.__get_error2(self.G33n,self.Ghatn,self.G33n_old,self.Ghatn_old)
+        self.G33n, self.Ghatn = self.__get_G(self.Sigma33n, self.Sigmahatn, self.G33_n_free_inverse, self.Ghat_n_free_inverse)
+        old_error[1] = self.__get_error(self.G33n,self.Ghatn,self.G33n_old,self.Ghatn_old)
         self.Ghatn = (1-weight[1])*self.Ghatn_old + weight[1]*self.Ghatn
         self.G33n = (1-weight[1])*self.G33n_old + weight[1]*self.G33n
 
         #denominator
-        self.Sigma33d, self.Sigmahatd = self.__get_Sigma2(self.G33d,self.Ghatd)
+        self.Sigma33d, self.Sigmahatd = self.__get_Sigma(self.G33d,self.Ghatd)
         self.G33d_old = self.G33d
         self.Ghatd_old = self.Ghatd
-        self.G33d, self.Ghatd = self.__get_G2(self.Sigma33d, self.Sigmahatd, self.G33_d_free_inverse, self.Ghat_d_free_inverse)
-        old_error[0] = self.__get_error2(self.G33d,self.Ghatd,self.G33d_old,self.Ghatd_old)
+        self.G33d, self.Ghatd = self.__get_G(self.Sigma33d, self.Sigmahatd, self.G33_d_free_inverse, self.Ghat_d_free_inverse)
+        old_error[0] = self.__get_error(self.G33d,self.Ghatd,self.G33d_old,self.Ghatd_old)
         self.Ghatd = (1-weight[0])*self.Ghatd_old + weight[0]*self.Ghatd
         self.G33d = (1-weight[0])*self.G33d_old + weight[0]*self.G33d
 
@@ -161,11 +161,11 @@ class SchwingerDyson:
             i += 1
 
             if (not self.didconverge[1]):
-                self.Sigma33n, self.Sigmahatn = self.__get_Sigma2(self.G33n,self.Ghatn)
+                self.Sigma33n, self.Sigmahatn = self.__get_Sigma(self.G33n,self.Ghatn)
                 self.G33n_old = self.G33n
                 self.Ghatn_old = self.Ghatn
-                self.G33n, self.Ghatn = self.__get_G2(self.Sigma33n, self.Sigmahatn, self.G33_n_free_inverse, self.Ghat_n_free_inverse)
-                error[1] = self.__get_error2(self.G33n,self.Ghatn,self.G33n_old,self.Ghatn_old)
+                self.G33n, self.Ghatn = self.__get_G(self.Sigma33n, self.Sigmahatn, self.G33_n_free_inverse, self.Ghat_n_free_inverse)
+                error[1] = self.__get_error(self.G33n,self.Ghatn,self.G33n_old,self.Ghatn_old)
                 if (error[1] > old_error[1]):
                     weight[1] = weight[1]/2
                 if (abs(old_error[1] - error[1]) < 1e-6*error[1]):
@@ -176,11 +176,11 @@ class SchwingerDyson:
                 self.G33n = (1-weight[1])*self.G33n_old + weight[1]*self.G33n
 
             if (not self.didconverge[0]):
-                self.Sigma33d, self.Sigmahatd = self.__get_Sigma2(self.G33d,self.Ghatd)
+                self.Sigma33d, self.Sigmahatd = self.__get_Sigma(self.G33d,self.Ghatd)
                 self.G33d_old = self.G33d
                 self.Ghatd_old = self.Ghatd
-                self.G33d, self.Ghatd = self.__get_G2(self.Sigma33d, self.Sigmahatd, self.G33_d_free_inverse, self.Ghat_d_free_inverse)
-                error[0] = self.__get_error2(self.G33d,self.Ghatd,self.G33d_old,self.Ghatd_old)
+                self.G33d, self.Ghatd = self.__get_G(self.Sigma33d, self.Sigmahatd, self.G33_d_free_inverse, self.Ghat_d_free_inverse)
+                error[0] = self.__get_error(self.G33d,self.Ghatd,self.G33d_old,self.Ghatd_old)
                 if (error[0] > old_error[0]):
                     weight[0] = weight[0]/2
                 if (abs(old_error[0] - error[0]) < 1e-6*error[0] ):

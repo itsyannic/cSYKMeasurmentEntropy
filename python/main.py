@@ -26,7 +26,7 @@ if (generate_data):
     for m in ms:
         sd.reset()
         sd.m = m
-        sd.solve2()
+        sd.solve()
 
         results.append(physics.results(sd))
         print(str(m) + ": S_JT=" +str(JT_entropy.S_gen(results[-1]['charge'],m,q,beta,J)) + ", S_cSYK=" + str(results[-1]['renyi2']) + ",  tr(G33)=" + str(results[-1]['trG33']))
