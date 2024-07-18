@@ -7,10 +7,10 @@ Gm = [[(0, 0, 1), (0, 3, 1), (0,4, 1), (0,7, 1)],
        [(7,0, 1), (7,3, 1), (7,4, 1), (7,7, 1)],
        [0,0]]
 
-Gmtilde = [[(1,1, -1), (1,2, 1), (1,5,-1), (1,6,1)],
-       [(2,1, 1), (2,2, -1), (2,5,1), (2,6,-1)],
-       [(5,1, -1), (5,2, 1), (5,5,-1), (5,6,1)],
-       [(6,1, 1), (6,2, -1), (6,5,1), (6,6,-1)],
+Gmtilde = [[(1,1, 1), (1,2, -1), (1,5,1), (1,6,-1)],
+       [(2,1, -1), (2,2, 1), (2,5,-1), (2,6,1)],
+       [(5,1, 1), (5,2, -1), (5,5,1), (5,6,-1)],
+       [(6,1, -1), (6,2, 1), (6,5,-1), (6,6,1)],
        [1,1]]
 
 G_maps = {'Gm': Gm, 'Gmtilde': Gmtilde}
@@ -39,7 +39,8 @@ def read_G_from_Ghat(matrix, step):
 
     matrix_dict = {}
 
-    matrices = np.zeros(step)
+    matrices = []
+    map = G_maps['Gm']
 
     for i in range(len(map)-1):
         row = []
@@ -57,13 +58,11 @@ def read_G_from_Ghat(matrix, step):
             #put blocks into 2 by 2 form
             row.append(new_matrix)
         matrices.append(row)
-
-        matrix_dict[key] = np.block(matrices)
     
-    return matrix_dict
+    return np.block(matrices)
 
 def create_Sigma_hat(matrices, step):
-    Sigma_hat = np.empty((8*step,8*step), dtype=object)
+    Sigma_hat = np.zeros((8*step,8*step), dtype=object)
 
     for key in G_maps:
         map = G_maps[key]

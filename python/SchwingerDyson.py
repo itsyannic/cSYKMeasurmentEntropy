@@ -71,25 +71,23 @@ class SchwingerDyson:
         #denominator
         Gdij = fields.read_G_from_Ghat(self.Ghatd, int(self.discretization/2))
 
-        brace = self.m/2*(Gdij['G11'] + Gdij['G22']) + (1-self.m)*self.G33d
-        Sigma_d11 = self.__normalization*self.Jsqr*np.power(brace,self.q-1)
-        Sigma_d_dict = {'G11': Sigma_d11, 'G22': Sigma_d11, 'G12': np.zeros((2*self.discretization, 2*self.discretization), dtype=np.double), 'G21': np.zeros((2*self.discretization, 2*self.discretization), dtype=np.double)} #Sigma12 must be mapped with the G21 map and vice versa
-        #the factor of two is ther to account for the fact that the Ghat matrix has a 1/2 in front while Sigmahat does not
-        #update Sigma matrices
-        self.Sigma33d = Sigma_d11
-        #print(max(np.amax(Sigma_d11),abs(np.amin(Sigma_d11))))
+        brace = self.m*(Gdij) + (1-self.m)*self.G33d
+        Sigma_d33 = -self.__normalization*self.Jsqr*np.power(brace,self.q/2)*np.transpose(np.power(brace,self.q/2-1))
+        Sigma_d11 = (Sigma_d33+np.transpose(Sigma_d33))/2
+        Sigma_d22 = (Sigma_d33-np.transpose(Sigma_d33))/2
+        Sigma_d_dict = {'Gm': Sigma_d11, 'Gmtilde': Sigma_d22}
+
 
         self.Sigmahatd = fields.create_Sigma_hat(Sigma_d_dict,int(self.discretization/2))
        
         #numerator
         Gnij = fields.read_G_from_Ghat(self.Ghatn, int(self.discretization/2))
 
-        brace = self.m/2*(Gnij['G11'] + Gnij['G22']) + (1-self.m)*self.G33n
-        Sigma_n11 = self.__normalization*self.Jsqr*np.power(brace,self.q-1)
-        Sigma_n_dict = {'G11': Sigma_n11, 'G22': Sigma_n11, 'G12': np.zeros((2*self.discretization, 2*self.discretization), dtype=np.double), 'G21': np.zeros((2*self.discretization, 2*self.discretization), dtype=np.double)}
-        #the factor of two is ther to account for the fact that the Ghat matrix has a 1/2 in front while Sigmahat does not
-        #update Sigma matrices
-        self.Sigma33n = Sigma_n11
+        brace = self.m*(Gnij) + (1-self.m)*self.G33d
+        Sigma_n33 = -self.__normalization*self.Jsqr*np.power(brace,self.q/2)*np.transpose(np.power(brace,self.q/2-1))
+        Sigma_n11 = (Sigma_n33+np.transpose(Sigma_n33))/2
+        Sigma_n22 = (Sigma_n33-np.transpose(Sigma_n33))/2
+        Sigma_n_dict = {'Gm': Sigma_n11, 'Gmtilde': Sigma_n22}
 
         self.Sigmahatn = fields.create_Sigma_hat(Sigma_n_dict,int(self.discretization/2))
     
@@ -159,6 +157,7 @@ class SchwingerDyson:
                 #print("Weight updated at iteration step n = " + str(i) + ": x = "+ str(weight) + "\n")
 
             old_error = error
+            print(error)
 
             i += 1
 
