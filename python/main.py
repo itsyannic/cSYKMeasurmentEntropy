@@ -34,14 +34,15 @@ else:
     file.close()
 
 #plot data
-m = [point['m'] for point in results]
-I = [point['renyi2'] for point in results]
-#JT = [JT_entropy.S_gen(point['charge'],point['m'],q,beta,J) for point in results]
+
+# m = [point['m'] for point in results]
+# I = [point['renyi2'] for point in results]
+# #JT = [JT_entropy.S_gen(point['charge'],point['m'],q,beta,J) for point in results]
 
 
-plt.scatter(m,I)
-#plt.plot(m,JT)
-plt.xlabel('m')
-plt.ylabel('Renyi-2 Entropy I2')
-plt.title('beta = ' + str(beta) + ', q=' + str(q))
-plt.show()
+# plt.scatter(m,I)
+# #plt.plot(m,JT)
+# plt.xlabel('m')
+# plt.ylabel('Renyi-2 Entropy I2')
+# plt.title('beta = ' + str(beta) + ', q=' + str(q))
+# plt.show()
