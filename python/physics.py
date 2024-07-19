@@ -11,8 +11,8 @@ def on_shell_action_den(SD_Object: SchwingerDyson):
     Gmd = fields.read_G_from_Ghat(SD_Object.Ghatd, int(SD_Object.discretization/2))
     brace = m*Gmd + (1-m)*SD_Object.G33d
     Gsqr = np.power(brace,SD_Object.q/2)
-    Gsqr = Gsqr*np.transpose(Gsqr)
-    term3 = -(SD_Object.Jsqr*(1/SD_Object.q - 1)*np.trace(Gsqr)/(SD_Object.discretization*2)**2)
+    
+    term3 = -(SD_Object.Jsqr*(1/SD_Object.q - 1)*np.trace(Gsqr@Gsqr)/(SD_Object.discretization*2)**2)
 
     return term1 + term2 + term3
 
@@ -25,8 +25,8 @@ def on_shell_action_num(SD_Object: SchwingerDyson):
     Gmn = fields.read_G_from_Ghat(SD_Object.Ghatn, int(SD_Object.discretization/2))
     brace = m*Gmn + (1-m)*SD_Object.G33n
     Gsqr = np.power(brace,SD_Object.q/2)
-    Gsqr = Gsqr*np.transpose(Gsqr)
-    term3 = -(SD_Object.Jsqr*(1/SD_Object.q - 1)*np.trace(Gsqr)/(SD_Object.discretization*2)**2)
+    
+    term3 = -(SD_Object.Jsqr*(1/SD_Object.q - 1)*np.trace(Gsqr@Gsqr)/(SD_Object.discretization*2)**2)
 
     return term1 + term2 + term3
 
