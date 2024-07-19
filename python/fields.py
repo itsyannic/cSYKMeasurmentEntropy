@@ -13,19 +13,7 @@ G22 = [[(1,1, 1), (1,2, -1), (1,5,1), (1,6,-1)],
        [(6,1, -1), (6,2, 1), (6,5,-1), (6,6,1)],
        [1,1]]
 
-G12 = [[(0,1,1), (0,2,1), (0,5,1), (0,6, 1)],
-       [(3,1,1), (3,2,1), (3,5,1), (3,6, 1)],
-       [(4,1,1), (4,2,1), (4,5,1), (4,6, 1)],
-       [(7,1,1), (7,2,1), (7,5,1), (7,6, 1)],
-       [0,1]]
-
-G21 = [[(1,0,1), (1,3,1), (1,4,1), (1,7,1)],
-       [(2,0,1), (2,3,1), (2,4,1), (2,7, 1)],
-       [(5,0,1), (5,3,1), (5,4,1), (5,7, 1)],
-       [(6,0,1), (6,3,1), (6,4,1), (6,7, 1)],
-       [1,0]]
-
-G_maps = {'G11': G11, 'G22': G22, 'G12': G12, 'G21': G21}
+G_maps = {'G11': G11, 'G22': G22}
 
 #use maps to convert Ghat into G11, G22, etc.
 def read_G_from_Ghat(matrix, step):
@@ -60,7 +48,7 @@ def read_G_from_Ghat(matrix, step):
     return matrix_dict
 
 def create_Sigma_hat(matrices, step):
-    Sigma_hat = np.empty((8*step,8*step), dtype=object)
+    Sigma_hat = np.zeros((8*step, 8*step), dtype=np.double)
 
     for key in G_maps:
         map = G_maps[key]
