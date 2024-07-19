@@ -9,7 +9,7 @@ import JT_entropy
 generate_data = True
 ms = np.linspace(0,1.0,10,endpoint=False, dtype=np.double)
 #ms = [0.65]
-q = 12
+q = 4
 beta = 50
 N = 4*beta
 L = 0.0000001
