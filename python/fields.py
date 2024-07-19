@@ -62,7 +62,7 @@ def read_G_from_Ghat(matrix, step):
     return np.block(matrices)
 
 def create_Sigma_hat(matrices, step):
-    Sigma_hat = np.zeros((8*step,8*step), dtype=object)
+    Sigma_hat = np.zeros((8*step,8*step), dtype=np.double)
 
     for key in G_maps:
         map = G_maps[key]

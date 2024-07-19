@@ -79,6 +79,7 @@ class SchwingerDyson:
 
 
         self.Sigmahatd = fields.create_Sigma_hat(Sigma_d_dict,int(self.discretization/2))
+        self.Sigma33d = Sigma_d33
        
         #numerator
         Gnij = fields.read_G_from_Ghat(self.Ghatn, int(self.discretization/2))
@@ -90,6 +91,7 @@ class SchwingerDyson:
         Sigma_n_dict = {'Gm': Sigma_n11, 'Gmtilde': Sigma_n22}
 
         self.Sigmahatn = fields.create_Sigma_hat(Sigma_n_dict,int(self.discretization/2))
+        self.Sigma33n = Sigma_n33
     
     #use first S.-D. equation to calculate Ghat and G33
     def __get_G(self, weight):
