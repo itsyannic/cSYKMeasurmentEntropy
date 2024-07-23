@@ -2,8 +2,8 @@ import numpy as np
 from matplotlib import pyplot as plt
 import JT_entropy
 
-q = 4
-beta = 100
+q = 8
+beta = 25
 J = 1
 
 xs = np.linspace(0,1,50, endpoint=False)
