@@ -43,11 +43,11 @@ class SchwingerDyson:
         self.G33dfree = self.G33d
         self.G33nfree = self.G33n
 
-        self.Ghat_d_free_inverse = np.linalg.inv(self.Ghatd)
-        self.Ghat_n_free_inverse = np.linalg.inv(self.Ghatn)
+        self.Ghat_d_free_inverse = np.linalg.solve(self.Ghatd, np.identity(4*self.discretization,dtype=np.double))
+        self.Ghat_n_free_inverse = np.linalg.solve(self.Ghatn, np.identity(4*self.discretization,dtype=np.double))
 
-        self.G33_d_free_inverse = np.linalg.inv(self.G33d)
-        self.G33_n_free_inverse = np.linalg.inv(self.G33n)
+        self.G33_d_free_inverse = np.linalg.solve(self.G33d, np.identity(2*self.discretization,dtype=np.double))
+        self.G33_n_free_inverse = np.linalg.solve(self.G33n, np.identity(2*self.discretization,dtype=np.double))
 
     @property
     def beta(self):
@@ -111,8 +111,8 @@ class SchwingerDyson:
 
     def __get_G(self, Sigma33, Sigmahat, G33free_inv, Ghatfree_inv):
 
-        Ghat = np.linalg.inv(Ghatfree_inv.astype(np.double) - Sigmahat.astype(np.double))
-        G33 = np.linalg.inv(G33free_inv.astype(np.double) - Sigma33.astype(np.double))
+        Ghat = np.linalg.solve(Ghatfree_inv.astype(np.double) - Sigmahat.astype(np.double), np.identity(4*self.discretization,dtype=np.double))
+        G33 = np.linalg.solve(G33free_inv.astype(np.double) - Sigma33.astype(np.double), np.identity(2*self.discretization,dtype=np.double))
 
         return G33, Ghat
     
