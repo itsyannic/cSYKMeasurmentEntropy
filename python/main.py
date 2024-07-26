@@ -10,8 +10,8 @@ generate_data = True
 ms = np.linspace(0,1.0,10,endpoint=False, dtype=np.double)
 #ms = [0.65]
 q = 4
-beta = 25
-N = 80
+beta = 10
+N = 50
 L = 0.0000001
 J = 1
 

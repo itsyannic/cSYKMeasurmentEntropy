@@ -71,18 +71,30 @@ class SchwingerDyson:
                 else:
                     self.G33d[i,j] = 0
 
+        length = self.discretization
+        M = np.arange(length).reshape(-1,1) - np.arange(length)
+        M = np.heaviside(M,0.0)
+
+        self.Ghatn[0:length, 0:length] = M
+        self.Ghatn[0:length, 3*length:4*length] = -M.transpose()
+        self.Ghatn[length:2*length, length:2*length] = M
+        self.Ghatn[length:2*length, 2*length:3*length] = -M.transpose()
+        self.Ghatn[2*length:3*length, length:2*length] = M.transpose()
+        self.Ghatn[2*length:3*length, 2*length:3*length] = M
+        self.Ghatn[3*length:4*length, 0:length] = M.transpose()
+        self.Ghatn[3*length:4*length, 3*length:4*length] = M
+
+        M = np.block([[M,-M.transpose()], [M.transpose(),M]])
+
+        self.Ghatd[0:2*length,0:2*length] = M
+        self.Ghatd[2*length:4*length,2*length:4*length] = M
+
         for i in range(4*self.discretization):
             for j in range(4*self.discretization):
+                if (i==j):
 
-                if ( ((self.discretization<=i<3*self.discretization) and (self.discretization<=j<3*self.discretization)) or (( i< self.discretization or 3*self.discretization<=i<4*self.discretization) and ( j < self.discretization or 3*self.discretization<=j<4*self.discretization))):
-                    self.Ghatn[i,j] = 0.5*np.sign(i-j, dtype=np.double)
-                else:
-                    self.Ghatn[i,j] = 0
-
-                if ((i<2*self.discretization and j<2*self.discretization) or (i >= 2*self.discretization and j>=2*self.discretization )):
-                    self.Ghatd[i,j] = 0.5*np.sign(i-j, dtype=np.double)
-                else:
-                    self.Ghatd[i,j] = 0
+                    self.Ghatd[i,j] = 1
+                    self.Ghatn[i,j] = 1
 
     def reset(self):
 
