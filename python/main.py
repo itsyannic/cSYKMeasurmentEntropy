@@ -1,3 +1,4 @@
+#import all modules
 import numpy as np
 from matplotlib import pyplot as plt
 import json
