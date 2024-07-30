@@ -72,29 +72,30 @@ class SchwingerDyson:
                     self.G33d[i,j] = 0
 
         length = self.discretization
-        M = np.arange(length).reshape(-1,1) - np.arange(length)
-        M = np.heaviside(M,0.0)
+        string = np.concatenate( (np.full(int(length/2), -1, dtype=np.double),
+                                  np.full(length, 0, dtype=np.double),
+                                  np.full(length, 1, dtype=np.double),
+                                  np.full(length, 0, dtype=np.double), 
+                                  np.full(int(length/2), -1, dtype=np.double)
+                                  ) )
+        M = np.array([string[2*length-i:(4*length-i)] for i in range(2*length)], dtype=np.double)
+        #print(M)
 
-        self.Ghatn[0:length, 0:length] = M
-        self.Ghatn[0:length, 3*length:4*length] = -M.transpose()
-        self.Ghatn[length:2*length, length:2*length] = M
-        self.Ghatn[length:2*length, 2*length:3*length] = -M.transpose()
-        self.Ghatn[2*length:3*length, length:2*length] = M.transpose()
-        self.Ghatn[2*length:3*length, 2*length:3*length] = M
-        self.Ghatn[3*length:4*length, 0:length] = M.transpose()
-        self.Ghatn[3*length:4*length, 3*length:4*length] = M
+        G_dict = {'G11': M, 'G22': M }
 
-        M = np.block([[M,-M.transpose()], [M.transpose(),M]])
+        self.Ghatn = fields.create_Sigma_hat(G_dict,int(length/2))
 
-        self.Ghatd[0:2*length,0:2*length] = M
-        self.Ghatd[2*length:4*length,2*length:4*length] = M
+        string = np.concatenate( (np.full(int(length/2), -1, dtype=np.double),
+                                  np.full(int(length/2), 0, dtype=np.double),
+                                  np.full(int(length/2), 1, dtype=np.double),
+                                  np.full(int(length/2), 0, dtype=np.double), 
+                                  np.full(int(length/2), -1, dtype=np.double)
+                                  ) )
+        M = np.array([string[int(1.25*length)-i:(int(2.25*length)-i)] for i in range(length)], dtype=np.double)
+        M = np.block([[M,np.zeros((length,length))], [np.zeros((length,length)),M]])
+        G_dict = {'G11': M, 'G22': M }
 
-        for i in range(4*self.discretization):
-            for j in range(4*self.discretization):
-                if (i==j):
-
-                    self.Ghatd[i,j] = 1
-                    self.Ghatn[i,j] = 1
+        self.Ghatd = fields.create_Sigma_hat(G_dict,int(length/2))
 
     def reset(self):
 

@@ -6,15 +6,17 @@ import fields
 beta = 20
 q = 4
 J = 0
-N = 80
+N = 100
 L = 0.000001
 
 sd = SchwingerDyson(beta,q,J,1,N,L,weight=0.5,max_iter=5000, silent=True)
-Gdij = fields.read_G_from_Ghat(sd.Ghatn, int(sd.discretization/2))
+sd.solve()
+Gdij = fields.read_G_from_Ghat(sd.Ghatd, int(sd.discretization/2))
 Gm = Gdij['G11']
 Gmt = Gdij['G11'].transpose()
+#print(Gm)
 
-print(len(Gm[0]))
-tau = np.linspace(-2*beta,2*beta,4*N)
-plt.plot(tau,np.concatenate((Gmt[0], Gm[0])))
+tau1 = 0
+tau2 = np.linspace(-beta,beta,2*N)
+plt.plot(tau2,np.concatenate((-Gm[tau1][0:N], Gm[tau1][0:N])))
 plt.show()
