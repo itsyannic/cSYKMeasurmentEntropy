@@ -14,7 +14,7 @@ q = 4
 beta = 10
 N = 50
 L = 0.0000001
-J = 0
+J = 1
 
 filebase = 'Data/beta=' + str(beta) + 'q=' + str(q) + 'N=' +str(N)
 
