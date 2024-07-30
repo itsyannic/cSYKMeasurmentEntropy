@@ -6,7 +6,7 @@ import fields
 beta = 100
 q = 4
 J = 1
-N = 100
+N = 50
 L = 0.000001
 
 sd = SchwingerDyson(beta,q,J,1,N,L,weight=0.5,max_iter=5000, silent=True)
