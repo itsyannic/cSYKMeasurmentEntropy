@@ -81,7 +81,7 @@ class SchwingerDyson:
         M = np.array([string[2*length-i:(4*length-i)] for i in range(2*length)], dtype=np.double)
         #print(M)
 
-        G_dict = {'G11': M, 'G22': M }
+        G_dict = {'G11': M, 'G22': -M.transpose() }
 
         self.Ghatn = fields.create_Sigma_hat(G_dict,int(length/2))
 
@@ -93,7 +93,7 @@ class SchwingerDyson:
                                   ) )
         M = np.array([string[int(1.25*length)-i:(int(2.25*length)-i)] for i in range(length)], dtype=np.double)
         M = np.block([[M,np.zeros((length,length))], [np.zeros((length,length)),M]])
-        G_dict = {'G11': M, 'G22': M }
+        G_dict = {'G11': M, 'G22': -M.transpose() }
 
         self.Ghatd = fields.create_Sigma_hat(G_dict,int(length/2))
 

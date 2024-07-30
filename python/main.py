@@ -11,9 +11,9 @@ generate_data = True
 ms = np.linspace(0,1.0,10,endpoint=False, dtype=np.double)
 #ms = [0.65]
 q = 4
-beta = 10
+beta = 3
 N = 50
-L = 0.0000001
+L = 0.00000000001
 J = 1
 
 filebase = 'Data/beta=' + str(beta) + 'q=' + str(q) + 'N=' +str(N)
@@ -49,7 +49,7 @@ else:
 m = [point['m'] for point in results]
 I = [point['renyi2'] for point in results]
 x = np.linspace(0,1,50, endpoint=False)
-JT = [JT_entropy.S_gen(0,point['m'],q,beta,J) for point in results]
+JT = [JT_entropy.S_gen(point['m']/2,point['m'],q,beta,J) for point in results]
 
 
 plt.scatter(m,I)
