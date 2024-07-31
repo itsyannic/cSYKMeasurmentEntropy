@@ -72,10 +72,10 @@ class SchwingerDyson:
                     self.G33d[i,j] = 0
 
         length = self.discretization
-        string = np.concatenate( (np.full(length, 0, dtype=np.double),
-                                  np.full(length, 1, dtype=np.double),
-                                  np.full(length, 0, dtype=np.double), 
-                                  np.full(int(length), -1, dtype=np.double)
+        string = np.concatenate( (np.full(length, 1, dtype=np.double),
+                                  np.full(length, 0, dtype=np.double),
+                                  np.full(length, -1, dtype=np.double), 
+                                  np.full(int(length), 0, dtype=np.double)
                                   ) )
         M = np.array([string[2*length-i:(4*length-i)] for i in range(2*length)], dtype=np.double)
         #print(M)
@@ -84,10 +84,10 @@ class SchwingerDyson:
 
         self.Ghatn = fields.create_Sigma_hat(G_dict,int(length/2))
 
-        string = np.concatenate( (np.full(int(length/2), 0, dtype=np.double),
-                                  np.full(int(length/2), 1, dtype=np.double),
-                                  np.full(int(length/2), 0, dtype=np.double), 
-                                  np.full(int(length/2), -1, dtype=np.double)
+        string = np.concatenate( (np.full(int(length/2), 1, dtype=np.double),
+                                  np.full(int(length/2), 0, dtype=np.double),
+                                  np.full(int(length/2), -1, dtype=np.double), 
+                                  np.full(int(length/2), 0, dtype=np.double)
                                   ) )
         M = np.array([string[int(length)-i:(int(2*length)-i)] for i in range(length)], dtype=np.double)
         M = np.block([[M,np.zeros((length,length))], [np.zeros((length,length)),M]])

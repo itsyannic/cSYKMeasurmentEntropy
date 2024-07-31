@@ -13,7 +13,7 @@ ms = np.linspace(0,1.0,10,endpoint=False, dtype=np.double)
 q = 4
 beta = 20
 N = 200
-L = 0.00000000001
+L = 0.0000000000001
 J = 1
 
 filebase = 'Data/beta=' + str(beta) + 'q=' + str(q) + 'N=' +str(N)
