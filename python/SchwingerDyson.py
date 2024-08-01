@@ -112,7 +112,7 @@ class SchwingerDyson:
         brace = self.m*Gdij['G11'] + (1-self.m)*G33
         Sigma33 = -self.normalization*self.Jsqr*np.multiply(np.power(brace,self.q/2), np.power(np.transpose(brace),self.q/2-1))
         Sigma11 = Sigma33
-        Sigma22 = Sigma33
+        Sigma22 = np.zeros((2*self.discretization,2*self.discretization),dtype=np.double)
         Sigma_dict = {'G11': Sigma11, 'G22': Sigma22 } #Sigma12 must be mapped with the G21 map and vice versa
         #the factor of two is ther to account for the fact that the Ghat matrix has a 1/2 in front while Sigmahat does not
         #update Sigma matrices

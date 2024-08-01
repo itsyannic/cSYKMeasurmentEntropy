@@ -8,12 +8,12 @@ import JT_entropy
 
 #set plot parameters
 generate_data = True
-ms = np.linspace(0,1.0,10,endpoint=False, dtype=np.double)
+ms = np.linspace(0,0.65,20,endpoint=False, dtype=np.double)
 #ms = [0.65]
 q = 4
-beta = 10
+beta = 400
 N = 100
-L = 0.000000000000001
+L = 0.00000000000000001
 J = 1
 
 filebase = 'Data/beta=' + str(beta) + 'q=' + str(q) + 'N=' +str(N)
@@ -30,7 +30,7 @@ if (generate_data):
         sd.solve()
 
         results.append(physics.results(sd))
-        print(str(m) + ": S_JT=" +str(JT_entropy.S_gen(0,m,q,beta,J)) + ", S_cSYK=" + str(results[-1]['renyi2']) + ",  tr(G33)=" + str(results[-1]['trG33']))
+        print(str(m) + ": S_JT=" +str(JT_entropy.S_gen(results[-1]['charge'],m,q,beta,J)) + ", S_cSYK=" + str(results[-1]['renyi2']) + ",  tr(G33)=" + str(results[-1]['trG33']))
 
     #save data to file
     param = {'q': q, 'beta': beta, 'J': J, 'N': N, 'L': L, 'data': results}
