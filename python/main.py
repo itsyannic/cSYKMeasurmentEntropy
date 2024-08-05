@@ -8,10 +8,10 @@ import JT_entropy
 
 #set plot parameters
 generate_data = True
-ms = np.linspace(0,0.65,20,endpoint=False, dtype=np.double)
+ms = np.linspace(0,0.6175,39,endpoint=True, dtype=np.double)
 #ms = [0.65]
 q = 4
-beta = 400
+beta = 200
 N = 100
 L = 0.00000000000000001
 J = 1
@@ -52,10 +52,11 @@ x = np.linspace(0,1,50, endpoint=False)
 JT = [JT_entropy.S_gen(point['m']/2,point['m'],q,beta,J) for point in results]
 
 
-plt.scatter(m,I)
-plt.plot(m,JT)
+plt.scatter(m,I,label="complex SYK")
+plt.plot(m,JT,label="charged JT")
 plt.xlabel('m')
-plt.ylabel('Renyi-2 Entropy I2')
+plt.ylabel('Entropy')
 plt.title('beta = ' + str(beta) + ', q=' + str(q))
+plt.legend(loc="upper right")
 plt.savefig(filebase + '.jpg')
 plt.show()
