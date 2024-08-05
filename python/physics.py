@@ -29,7 +29,7 @@ def on_shell_action_num(SD_Object: SchwingerDyson):
     return term1 + term2 + term3
 
 def trG33(SD_Object: SchwingerDyson):
-    return SD_Object.G33n[int(SD_Object.discretization/2),int(SD_Object.discretization/2)]
+    return np.trace(SD_Object.G33n)/len(SD_Object.G33n[0])
 
 def charge(SD_Object: SchwingerDyson, Iden, trG):
     #print((1-SD_Object.m)*np.trace(SD_Object.G33n))
