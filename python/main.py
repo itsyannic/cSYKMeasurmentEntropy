@@ -8,15 +8,15 @@ import JT_entropy
 
 #set plot parameters
 generate_data = True
-ms = np.linspace(0,0.6175,39,endpoint=True, dtype=np.double)
+ms = np.linspace(0,1.0,50,endpoint=False, dtype=np.double)
 #ms = [0.65]
 q = 4
-beta = 200
+beta = 50
 N = 100
 L = 0.00000000000000001
 J = 1
 
-filebase = 'Data/beta=' + str(beta) + 'q=' + str(q) + 'N=' +str(N)
+filebase = 'Data/alt_charge_beta=' + str(beta) + 'q=' + str(q) + 'N=' +str(N)
 
 if (generate_data):
     
@@ -49,7 +49,7 @@ else:
 m = [point['m'] for point in results]
 I = [point['renyi2'] for point in results]
 x = np.linspace(0,1,50, endpoint=False)
-JT = [JT_entropy.S_gen(point['m']/2,point['m'],q,beta,J) for point in results]
+JT = [JT_entropy.S_gen(point['charge'],point['m'],q,beta,J) for point in results]
 
 
 plt.scatter(m,I,label="complex SYK")

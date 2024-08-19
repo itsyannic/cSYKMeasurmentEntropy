@@ -3,13 +3,15 @@ from matplotlib import pyplot as plt
 import JT_entropy
 
 q = 8
-beta = 25
+beta = 20
 J = 1
 
-xs = np.linspace(0,1,50, endpoint=False)
-JT = [JT_entropy.S_gen(0,x,q,beta,J) for x in xs]
+xs = np.linspace(0,1,200, endpoint=False)
+JT = [JT_entropy.S_gen(x,x,q,beta,J) for x in xs]
 
 plt.plot(xs,JT)
 plt.xlabel('Q')
 plt.ylabel('Renyi-2 Entropy I2')
+plt.xlim(0,0.5)
+plt.ylim(bottom=0)
 plt.show()
