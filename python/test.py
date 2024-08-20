@@ -4,13 +4,13 @@ from SchwingerDyson import SchwingerDyson
 import fields
 import physics
 
-beta = 100
+beta = 500
 q = 4
-J = 0
+J = 1
 N = 200
 L = 0.000001
 
-sd = SchwingerDyson(beta,q,J,1,N,L,weight=0.5,max_iter=5000, silent=True)
+sd = SchwingerDyson(beta,q,J,1.0,N,L,weight=0.5,max_iter=5000, silent=True)
 sd.solve()
 print(np.log(np.linalg.det(sd.Ghat_n_free_inverse))-np.log(np.linalg.det(sd.Ghat_d_free_inverse)))
 print(np.log(np.linalg.det(sd.G33_n_free_inverse))-np.log(np.linalg.det(sd.G33_d_free_inverse)))
@@ -19,7 +19,7 @@ print(results['Iden'])
 print(results['Inum'])
 print("S="+str(results['renyi2']))
 Gdij = fields.read_G_from_Ghat(sd.Ghatn, int(sd.discretization/2))
-Gm = Gdij['G11']
+Gm =  (Gdij['G11'] - np.transpose(Gdij['G22']))/2
 #Gm = sd.G33n
 Gmt = Gdij['G11'].transpose()
 
