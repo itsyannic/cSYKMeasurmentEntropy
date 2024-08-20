@@ -64,14 +64,31 @@ class SchwingerDyson:
         for i in range(2*self.discretization):
             for j in range(2*self.discretization):
                 self.G33n[i,j] = 0.5*np.sign(i-j, dtype=np.double)
-                self.G11n[i,j] = np.heaviside(i-j,0.5,dtype=np.double)
 
                 if ((i<self.discretization and j<self.discretization) or (i >= self.discretization and j>=self.discretization )):
                     self.G33d[i,j] = 0.5*np.sign(i-j, dtype=np.double)
-                    self.G11d[i,j] = np.heaviside(i-j,0.5,dtype=np.double)
                 else:
                     self.G33d[i,j] = 0
-                    self.G11d[i,j] = 0
+
+        length = self.discretization
+        string = np.concatenate( (np.full(length, 1, dtype=np.double),
+                                  np.full(length, 0, dtype=np.double),
+                                  np.full(length, -1, dtype=np.double), 
+                                  np.full(int(length), 0, dtype=np.double)
+                                  ) )
+        M = np.array([string[2*length-i:(4*length-i)] for i in range(2*length)], dtype=np.double)
+
+        self.G11n = M
+
+        string = np.concatenate( (np.full(int(length/2), 1, dtype=np.double),
+                                  np.full(int(length/2), 0, dtype=np.double),
+                                  np.full(int(length/2), -1, dtype=np.double), 
+                                  np.full(int(length/2), 0, dtype=np.double)
+                                  ) )
+        M = np.array([string[int(length)-i:(int(2*length)-i)] for i in range(length)], dtype=np.double)
+        M = np.block([[M,np.zeros((length,length))], [np.zeros((length,length)),M]])
+
+        self.G11d = M
 
 
     def reset(self):

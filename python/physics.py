@@ -18,7 +18,7 @@ def on_shell_action_num(SD_Object: SchwingerDyson):
 
     m = SD_Object.m
     arg = np.linalg.det(np.linalg.inv(SD_Object.G11_n_free_inverse@SD_Object.G11n))
-    term1 = -m*(np.log(arg) + np.log(2,dtype=np.double)) 
+    term1 = -m*(np.log(arg) ) 
     term2 = -(1-m)*(np.log(np.linalg.det(np.linalg.inv(SD_Object.G33_n_free_inverse@SD_Object.G33n))) + np.log(2,dtype=np.double))
     brace = m*SD_Object.G11n + (1-m)*SD_Object.G33n
     Gsqr = np.power(brace,SD_Object.q/2)

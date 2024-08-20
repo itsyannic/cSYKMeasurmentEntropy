@@ -4,9 +4,9 @@ from SchwingerDyson import SchwingerDyson
 import fields
 import physics
 
-beta = 100
+beta = 1000
 q = 4
-J = 0
+J = 1
 N = 200
 L = 0.000001
 
