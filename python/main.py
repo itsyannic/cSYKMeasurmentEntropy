@@ -11,7 +11,7 @@ generate_data = True
 ms = np.linspace(0,1.0,50,endpoint=False, dtype=np.double)
 #ms = [0.65]
 q = 4
-beta = 50
+beta = 200
 N = 100
 L = 0.00000000000000001
 J = 1
