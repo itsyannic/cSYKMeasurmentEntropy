@@ -16,7 +16,7 @@ N = 100
 L = 0.00000000000000001
 J = 1
 
-filebase = 'Data/alt_charge_beta=' + str(beta) + 'q=' + str(q) + 'N=' +str(N)
+filebase = 'Data/symmtric_charge_beta=' + str(beta) + 'q=' + str(q) + 'N=' +str(N)
 
 if (generate_data):
     
