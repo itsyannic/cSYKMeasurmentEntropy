@@ -3,10 +3,10 @@ from matplotlib import pyplot as plt
 from SchwingerDyson import SchwingerDyson
 import fields
 
-beta = 20
+beta = 40
 q = 4
-J = 0
-N = 10
+J = 1
+N = 100
 L = 0.000001
 
 sd = SchwingerDyson(beta,q,J,1,N,L,weight=0.5,max_iter=5000, silent=True)

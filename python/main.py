@@ -1,5 +1,6 @@
+import sys
+import os
 import numpy as np
-from matplotlib import pyplot as plt
 import json
 from SchwingerDyson import SchwingerDyson
 import physics
@@ -7,14 +8,20 @@ import JT_entropy
 
 #set plot parameters
 generate_data = True
-ms = np.linspace(0,1.0,10,endpoint=False, dtype=np.double)
-#ms = [0.65]
-q = 12
-beta = 50
-N = 4*beta
-L = 0.0000001
+ms = np.linspace(0,1.0,50,endpoint=False, dtype=np.double)
+q = 4
+beta = 30
+N = 400
+L = np.double(0.000000001)
 J = 1
 
+#process system input and re-set beta if required
+if (len(sys.argv) > 1):
+    beta = np.double(sys.argv[1])
+
+print("beta = " +str(beta))
+
+#prepare output
 filebase = 'Data/beta=' + str(beta) + 'q=' + str(q) + 'N=' +str(N)
 
 if (generate_data):
@@ -34,7 +41,10 @@ if (generate_data):
     #save data to file
     param = {'q': q, 'beta': beta, 'J': J, 'N': N, 'L': L, 'data': results}
     json_obj = json.dumps(param)
+    if (not os.path.exists("Data/")):
+        os.makedirs("Data")
     output = open(filebase + '_data.out', "w")
+
     output.write(json_obj)
     output.close()
 else:
@@ -43,7 +53,7 @@ else:
     results = json.loads(input)['data']
     file.close()
 
-
+"""
 #plot data
 m = [point['m'] for point in results]
 I = [point['renyi2'] for point in results]
@@ -56,5 +66,6 @@ plt.plot(m,JT)
 plt.xlabel('m')
 plt.ylabel('Renyi-2 Entropy I2')
 plt.title('beta = ' + str(beta) + ', q=' + str(q))
-#plt.show()
 plt.savefig(filebase + '.jpg')
+plt.show()
+"""

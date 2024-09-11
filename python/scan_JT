@@ -2,14 +2,14 @@ import numpy as np
 from matplotlib import pyplot as plt
 import JT_entropy
 
-q = 12
-beta = 125
+q = 4
+beta = 10
 J = 1
 
 xs = np.linspace(0,1,50, endpoint=False)
 JT = [JT_entropy.S_gen(x/2,x,q,beta,J) for x in xs]
 
 plt.plot(xs,JT)
-plt.xlabel('Q')
+plt.xlabel('m')
 plt.ylabel('Renyi-2 Entropy I2')
 plt.show()
