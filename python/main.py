@@ -5,9 +5,10 @@ import json
 from SchwingerDyson import SchwingerDyson
 import physics
 import JT_entropy
+from matplotlib import pyplot as plt
 
 #set plot parameters
-generate_data = True
+generate_data = False
 ms = np.linspace(0,1.0,20,endpoint=False, dtype=np.double)
 q = 4
 beta = 50
@@ -53,7 +54,7 @@ else:
     results = json.loads(input)['data']
     file.close()
 
-"""
+
 #plot data
 m = [point['m'] for point in results]
 I = [point['renyi2'] for point in results]
@@ -68,4 +69,3 @@ plt.ylabel('Renyi-2 Entropy I2')
 plt.title('beta = ' + str(beta) + ', q=' + str(q))
 plt.savefig(filebase + '.jpg')
 plt.show()
-"""
