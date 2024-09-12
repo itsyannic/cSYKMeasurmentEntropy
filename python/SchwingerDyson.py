@@ -117,7 +117,9 @@ class SchwingerDyson:
     def __get_error(self, G33, Ghat, G33_old, Ghat_old):
 
         matrices = [(Ghat - Ghat_old), (G33-G33_old)]
-        error = [np.abs(np.trace(matrix@matrix))*self.normalization for matrix in matrices]
+        error = [np.abs(np.trace(matrix@matrix)) for matrix in matrices]
+        error[0] = error[0]/(4*self.discretization**2)
+        error[1] = error[1]/(2*self.discretization**2)
         return error[0] + error[1]
 
     def solve(self):

@@ -8,10 +8,10 @@ import JT_entropy
 
 #set plot parameters
 generate_data = True
-ms = np.linspace(0,1.0,50,endpoint=False, dtype=np.double)
+ms = np.linspace(0,1.0,20,endpoint=False, dtype=np.double)
 q = 4
-beta = 30
-N = 400
+beta = 50
+N = 100
 L = np.double(0.000000001)
 J = 1
 
