@@ -8,10 +8,10 @@ import JT_entropy
 from matplotlib import pyplot as plt
 
 #set plot parameters
-generate_data = True
+generate_data = False
 ms = np.linspace(0,1.0,50,endpoint=False, dtype=np.double)
 q = 4
-beta = 20
+beta = 30
 N = 400
 L = np.double(0.00000000001)
 J = 1
@@ -37,18 +37,38 @@ if (generate_data):
         sd.solve()
 
         results.append(physics.results(sd))
-        print(results[-1])
+        print(str(m) + ": S_JT=" +str(JT_entropy.S_gen(results[-1]['charge'],m,q,beta,J)) + ", S_cSYK=" + str(results[-1]['renyi2']) + ",  tr(G33)=" + str(results[-1]['trG33']))
 
     #save data to file
     param = {'q': q, 'beta': beta, 'J': J, 'N': N, 'L': L, 'data': results}
     json_obj = json.dumps(param)
-    if (not os.path.exists("Data/")):
-        os.makedirs("Data")
+    output = open(filebase + '_data.out', "w")
+    output.write(json_obj)
+    output.close()
 else:
     file = open(filebase + '_data.out', "r")
     input = file.read()
     results = json.loads(input)['data']
     file.close()
+
+
+#plot data
+m = [point['m'] for point in results]
+I = [point['renyi2'] for point in results]
+x = np.linspace(0,1,50, endpoint=False)
+JT = [JT_entropy.S_gen(point['charge'],point['m'],q,beta,J) for point in results]
+
+plt.rcParams['text.usetex'] = True
+plt.rcParams['font.size'] = 15
+
+plt.scatter(m,I,label="complex SYK")
+plt.plot(m,JT,label="charged JT")
+plt.xlabel('$m$')
+plt.ylabel('$S$')
+plt.title('$\\beta = ' + str(beta) + '$, $q=' + str(q) +'$')
+plt.legend(loc="upper right")
+plt.savefig(filebase + '.pdf',dpi=1000)
+plt.show()
 
 sound = "/System/Library/Sounds/Submarine.aiff"
 os.system("afplay " + sound)
