@@ -33,6 +33,7 @@ for filename in files:
 plt.xlabel('$m$')
 plt.ylabel('$S$')
 plt.ylim(0,0.6)
+plt.xlim(0,1.0)
 plt.legend()
 plt.title('Reny-2 Entropy for $q=4$')
 plt.savefig('entropyvsm.pdf', dpi=1000)
@@ -56,6 +57,7 @@ for filename in files:
 
 plt.xlabel('$\mathcal{Q}$')
 plt.ylabel('$S$')
+plt.xlim(0,0.5)
 plt.ylim(0,0.6)
 plt.legend()
 plt.title('Reny-2 Entropy for $q=4$')
@@ -81,6 +83,7 @@ for filename in files:
 plt.xlabel('$m$')
 plt.ylabel('$\mathcal{Q}$')
 plt.ylim(0,0.6)
+plt.xlim(0,1.0)
 plt.legend()
 plt.title('Charge $\mathcal{Q}$ for $q=4$')
 plt.savefig('mvsQ.pdf', dpi=1000)

@@ -10,7 +10,6 @@ from matplotlib import pyplot as plt
 #set plot parameters
 generate_data = True
 ms = np.linspace(0,1.0,50,endpoint=False, dtype=np.double)
-ms = [0.96]
 q = 4
 beta = 20
 N = 400
