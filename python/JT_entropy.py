@@ -5,9 +5,18 @@ def beta_times_curly_J(q,beta,e,J):
 
     return q*J/np.sqrt(2*(2+2*np.cosh(2*np.pi*e))**(q/2.0-1.0))*beta
 
-def _curly_E(Q,m,q,beta):
+def theta(Q,q):
 
-    return (1.0/(2.0*np.pi))*np.log((1.0-2.0*Q)/(1.0+2.0*Q)) + 2.0*np.pi*Q*1/q**2 #second order expansion in 1/q see thermoelectric transport
+    theta = sc.optimize.fsolve(lambda x: Q + x/np.pi+(0.5-1/q)*np.sin(2*x)/np.sin(2*np.pi/q), [-np.pi/q,np.pi/q])
+
+    for t in theta:
+        if (t>-np.pi/q) and (t<np.pi/q):
+            return t
+        return 0
+    
+def _curly_E(Q,m,q,beta):
+    t = theta(Q,q)
+    return np.log(np.sin(np.pi/q+t)/np.sin(np.pi/q-t))/(2*np.pi)
 
 def integrand(x,epsilon):
     return 2*np.pi*x*np.sin(2*np.pi*x)/(np.cosh(2*np.pi*epsilon)-np.cos(2*np.pi*x))
