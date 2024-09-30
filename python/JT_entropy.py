@@ -1,6 +1,10 @@
 import numpy as np
 import scipy as sc
 
+def diff(f, x, h):
+
+    return (-f(x+2*h)+8*f(x+h)-8*f(x-h)+f(x-2*h))/(12*h)
+
 def beta_times_curly_J(q,beta,e,J):
 
     return q*J/np.sqrt(2*(2+2*np.cosh(2*np.pi*e))**(q/2.0-1.0))*beta
@@ -25,6 +29,10 @@ def _S_0(Q,q,e):
 
     return 0.47138 + sc.integrate.quad(lambda x: 2*np.pi*_curly_E(x,1,q,1), 0, Q)[0]
 
+def _I_JT(Q,beta,q,J):
+    e = _curly_E(Q,q)
+    betaJ = beta_times_curly_J(q,beta,e,J)
+    return -(q*np.pi*e)**2/(8*betaJ) - np.pi**2/(betaJ*q**2)
 
 def _S_Gravity(Q,q,beta_x_curlyJ,e):
 
