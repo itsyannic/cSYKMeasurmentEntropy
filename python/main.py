@@ -11,10 +11,10 @@ from matplotlib import pyplot as plt
 generate_data = False
 ms = np.linspace(0,1.0,50,endpoint=False, dtype=np.double)
 q = 4
-beta = 30
+beta = np.double(40)
 N = 400
 L = np.double(0.00000000001)
-J = 1
+J = np.double(1)
 
 #process system input and re-set beta if required
 if (len(sys.argv) > 1):
@@ -53,10 +53,10 @@ else:
 
 
 #plot data
-m = [point['m'] for point in results]
-I = [point['renyi2'] for point in results]
-x = np.linspace(0,1,50, endpoint=False)
-JT = [JT_entropy.S_gen(point['charge'],point['m'],q,beta,J) for point in results]
+m = np.array([point['m'] for point in results],dtype=np.double)
+I = np.array([point['renyi2'] for point in results],dtype=np.double)
+x = np.linspace(0,1,50, endpoint=False,dtype=np.double)
+JT = np.array([JT_entropy.S_gen(point['charge'],point['m'],q,beta,J) for point in results],dtype=np.double)
 
 plt.rcParams['text.usetex'] = True
 plt.rcParams['font.size'] = 15
