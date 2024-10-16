@@ -23,7 +23,7 @@ if (len(sys.argv) > 1):
 print("beta = " +str(beta))
 
 #prepare output
-filebase = 'Data/beta=' + str(beta) + 'q=' + str(q) + 'N=' +str(N)
+filebase = 'Data/beta=' + str(beta) + 'q=' + str(q) + 'N=' +str(N) + "_" + str(len(ms)) + "points"
 
 if (generate_data):
     
