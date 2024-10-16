@@ -6,12 +6,13 @@ from SchwingerDyson import SchwingerDyson
 import physics
 import JT_entropy
 from matplotlib import pyplot as plt
+import contextlib
 
 #set plot parameters
-generate_data = False
-ms = np.linspace(0,1.0,50,endpoint=False, dtype=np.double)
+generate_data = True
+ms = np.linspace(0,1.0,5,endpoint=False, dtype=np.double)
 q = 4
-beta = np.double(40)
+beta = np.double(2)
 N = 400
 L = np.double(0.00000000001)
 J = np.double(1)
@@ -37,7 +38,11 @@ if (generate_data):
         sd.solve()
 
         results.append(physics.results(sd))
-        print(str(m) + ": S_JT=" +str(JT_entropy.S_gen(results[-1]['charge'],m,q,beta,J)) + ", S_cSYK=" + str(results[-1]['renyi2']) + ",  tr(G33)=" + str(results[-1]['trG33']))
+        S_JT = 0
+        with contextlib.redirect_stderr(None):
+            S_JT = JT_entropy.S_gen(results[-1]['charge'],m,q,beta,J)
+
+        print(str(m) + ": S_JT=" +str(S_JT) + ", S_cSYK=" + str(results[-1]['renyi2']) + ",  tr(G33)=" + str(results[-1]['trG33']))
 
     #save data to file
     param = {'q': q, 'beta': beta, 'J': J, 'N': N, 'L': L, 'data': results}
