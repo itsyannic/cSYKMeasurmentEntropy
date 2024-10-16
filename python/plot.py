@@ -28,7 +28,7 @@ for filename in files:
     Q = [point['charge'] for point in results]
     I = [point['renyi2'] for point in results]
 
-    plt.scatter(m,I, label='$\\beta=$'+str(data['beta']))
+    plt.plot(m,I, label='$\\beta=$'+str(data['beta']))
 
 plt.xlabel('$m$')
 plt.ylabel('$S$')
@@ -78,7 +78,7 @@ for filename in files:
     Q = [point['charge'] for point in results]
     I = [point['renyi2'] for point in results]
 
-    plt.scatter(m,Q, label='$\\beta=$'+str(data['beta']))
+    plt.plot(m,Q, label='$\\beta=$'+str(data['beta']))
 
 plt.xlabel('$m$')
 plt.ylabel('$\mathcal{Q}$')
