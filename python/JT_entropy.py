@@ -32,8 +32,8 @@ def _I_JT(Q,beta,q,J):
 
 def _S_JT(Q,beta,q,J):
 
-    dQ = np.double(1e-8)
-    dbeta = np.double(1e-8)
+    dQ = np.double(1e-12)
+    dbeta = np.double(1e-12)
 
     I_JT = _I_JT(Q,beta,q,J)
     dI_JT = [_I_JT(Q+dQ,beta,q,J),_I_JT(Q,beta+dbeta,q,J),_I_JT(Q+dQ,beta+dbeta,q,J),
