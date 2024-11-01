@@ -9,10 +9,10 @@ from matplotlib import pyplot as plt
 import contextlib
 
 #set plot parameters
-generate_data = True
-ms = np.linspace(0,1.0,5,endpoint=False, dtype=np.double)
+generate_data = False
+ms = np.linspace(0,1.0,50,endpoint=False, dtype=np.double)
 q = 4
-beta = np.double(2)
+beta = np.double(30)
 N = 400
 L = np.double(0.00000000001)
 J = np.double(1)
@@ -56,6 +56,8 @@ else:
     results = json.loads(input)['data']
     file.close()
 
+sound = "/System/Library/Sounds/Submarine.aiff"
+os.system("afplay " + sound)
 
 #plot data
 m = np.array([point['m'] for point in results],dtype=np.double)
@@ -74,6 +76,3 @@ plt.title('$\\beta = ' + str(beta) + '$, $q=' + str(q) +'$')
 plt.legend(loc="upper right")
 plt.savefig(filebase + '.pdf',dpi=1000)
 plt.show()
-
-sound = "/System/Library/Sounds/Submarine.aiff"
-os.system("afplay " + sound)
