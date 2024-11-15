@@ -57,33 +57,39 @@ def _S_Gravity(Q,q,beta_x_curlyJ,e):
 
 def _S_Gauge(Q,q,beta_x_curlyJ,e):
 
-    return (q*np.pi*e/2)**2/beta_x_curlyJ*(1+e**2/beta_x_curlyJ*(4+np.pi*e*(q-2)*np.tanh(np.pi*e))/(4+16/q**2*beta_x_curlyJ*(1-4*Q**2+Q*(q-2)*np.tanh(np.pi*e))))
+    return (q*np.pi*e/2)**2/beta_x_curlyJ*(1+e**2/beta_x_curlyJ*(4+np.pi*e*(q-2)*np.tanh(np.pi*e))/( 4+16/q**2*beta_x_curlyJ*(1-4*Q**2+Q*(q-2)*np.tanh(np.pi*e)) ))
 
 def S_IR(Qin,m,q,beta,J):
     Q=Qin
     e = _curly_E(Q,q)
     betaJ = beta_times_curly_J(q,beta,e,J)
 
-    return _S_Gauge(Q,q,betaJ,e) + _S_Gravity(Q,q,betaJ,e) + _S_0(Q,q,e) -m*2*np.log(2.0)/12.0
+    return _S_JT(Q,beta,q,J) + _S_0(Q,q,e) -m*2*np.log(2.0)/12.0
 
-def S_UV(m,q):
+def S_UV(Q,q):
 
-    k = 1-m
+    k = 1-2*Q
 
-    return k*(np.log(2)-1/q**2*(np.arcsin(k**(3/2)))**2)
+    return k*(np.log(2)-(1/q**2)*( np.arcsin(k**(3/2)) )**2 )
 
 def S_gen(Q,m,q,beta,J):
 
-    return np.max([np.min([S_UV(m,q), S_IR(Q,m,q,beta,J)]),0])
+    return np.min([S_UV(Q,q), S_IR(Q,m,q,beta,J)])
 
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
 
     Qx = np.linspace(0,0.49,100)
+    S_0 = np.array([_S_0(Qx[i],4,1) for i in range(len(Qx))])
     S_JT = np.array([_S_JT(Qx[i],30,4,1) for i in range(len(Qx))])
     S_large_q = np.array([_S_Gauge(Qx[i],4,30,_curly_E(Qx[i],4)) + _S_Gravity(Qx[i],4,30,_curly_E(Qx[i],4)) for i in range(len(Qx))])
+    S_UV = [S_UV(Qx[i],4)for i in range(len(Qx))]
 
-    plt.plot(Qx,S_JT)
-    plt.plot(Qx,S_large_q)
+    plt.plot(Qx,S_JT, label="JT from I*",color="slategrey")
+    plt.plot(Qx,S_0, label="S0",color="cornflowerblue")
+    plt.plot(Qx,S_large_q,label="large q JT",color="navy")
+    plt.plot(Qx,S_UV,label="UV",color="lightseagreen")
+    plt.plot(Qx,np.zeros(len(Qx)),label="0",color="red")
+    plt.legend()
     plt.show()
     
