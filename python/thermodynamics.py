@@ -1,10 +1,8 @@
 import numpy as np
 import cSYK
 from scipy.optimize import fsolve
-
-_dQ = np.double(1e-2)
-_dB = np.double(1e-1)
-cSYK.init(30,0)
+import json
+from matplotlib import pyplot as plt
 
 def cSYKresults(beta,mu,q):
         
@@ -17,41 +15,77 @@ def Charge(xm,xb,q):
         #print("Q=" +str(result[0]) + ", mu" + str(xm))
         return result[0]
 
-def _gamma(mu,Q,beta,q,F):
+def makeData():
 
-    mulocal = fsolve(lambda x: Charge(x,beta+_dB,q)-Q,mu,xtol=1e-6)
-    Finc = cSYKresults(beta+_dB,mulocal,q)[1]
-    mulocal = fsolve(lambda x: Charge(x,beta-_dB,q)-Q,mu,xtol=1e-6)
-    Fdec = cSYKresults(beta-_dB,mulocal,q)[1]
-
-    return -(Finc-2*F+Fdec)/_dB**2
-
-def _Kinv(mu,Q,beta,q,F):
-
-    mulocal = fsolve(lambda x: Charge(x,beta,q)-Q-_dQ,mu,xtol=1e-6)
-    Finc = cSYKresults(beta,mulocal,q)[1]
-    mulocal = fsolve(lambda x: Charge(x,beta,q)-Q+_dQ,mu,xtol=1e-6)
-    Fdec = cSYKresults(beta,mulocal,q)[1]
-
-    return (Finc-2*F+Fdec)/_dQ**2
-
-def _main():
-
-    mu = 0.05
-    beta = 30
     q = 4
-    result = cSYKresults(beta,mu,q)
-    FreeEnergy = result[1]
-    Ql = result[0]
-    print("F(Q=" + str(Ql) + ")=" + str(FreeEnergy))
-    mulocal = fsolve(lambda x: Charge(x,beta,q)-Ql,mu,xtol=1e-7)
-    Flocal = cSYKresults(beta,mulocal,q)[1]
 
-    print(_Kinv(mu,Ql,beta,q,FreeEnergy))
-    print(_gamma(mu,Ql,beta,q,FreeEnergy))
+    cSYK.init(30,0)
 
+    N_beta = 20
+    N_Q = 30
+
+    Qs = np.linspace(0,0.30,N_Q,dtype=np.double)
+    betas = np.linspace(20,40,N_beta,dtype=np.double)
+
+    FreeArray = np.empty((N_beta,N_Q),dtype=np.double)
+    QArray = np.empty((N_beta,N_Q),dtype=np.double)
+    BetaArray =  np.empty((N_beta,N_Q),dtype=np.double)
+
+    i = 0
+    muQ = 0
+    for Ql in Qs:
+        j=0
+        mu = muQ
+        for beta in betas:
+            mu = fsolve(lambda x: Charge(x,beta,q)-Ql,mu,xtol=1e-7)[0]
+            if (j==0):
+                 muQ=mu
+            results = cSYKresults(beta,mu,q)
+            FreeArray[j,i] = results[1]
+            QArray[j,i] = results[0]
+            BetaArray[j,i] = beta
+            print(Ql-results[0])
+            j+=1
+        i+=1
+
+    output = {"beta": BetaArray.tolist(), "Q": QArray.tolist(), "F": FreeArray.tolist()}
+    json_obj = json.dumps(output)
+    f = open("free_energy.json", "w")
+    f.write(json_obj)
+    f.close()
+
+    return
+
+def processData():
+
+    f = open("free_energy.json", "r")
+    input = f.read()
+    results = json.loads(input)
+    betas = np.array(results["beta"])
+    Qs = np.array(results["Q"])
+    Fs = np.array(results["F"])
+
+    N_Q = 30
+    Qtarget = np.linspace(0,0.30,N_Q,dtype=np.double)
+    i=0
+    count = 0
+    for Ql in Qs.reshape(-1):
+         delta = Ql-Qtarget[i%N_Q]
+         if delta > 1e-3:
+            print(delta)
+
+            count+=1
+         i+=1
+    print(count)
+
+    i=0
+    for Fvec in Fs.swapaxes(0,1):
+        plt.scatter(betas.swapaxes(0,1)[i],Fvec)
+        i+=1
+    plt.show()
+         
     return
 
 if __name__ == "__main__":
 
-    _main()
+    makeData()
