@@ -202,4 +202,4 @@ if __name__ == "__main__":
     N_beta = 20
     N_Q = 30
 
-    makeData(N_Q,N_beta,q)
+    repairData(N_Q,N_beta,q)
