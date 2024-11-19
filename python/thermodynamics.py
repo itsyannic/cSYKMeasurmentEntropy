@@ -41,9 +41,9 @@ def makeData(N_Q,N_beta):
                 mu = fsolve(lambda x: Charge(x,beta,q)-Qt,mu,xtol=1e-7/(10**p))[0]
                 results = cSYKresults(beta,mu,q)
                 delta = Qt-results[0]
-                if (delta < 1e-4):
+                if (abs(delta) < 1e-4):
                     break
-                print("re-doing point, delta was: " + str(delta))
+                print("redoing point, delta was: " + str(delta))
             if (j==0):
                  muQ=mu
             
@@ -51,7 +51,7 @@ def makeData(N_Q,N_beta):
             QArray[j,i] = results[0]
             BetaArray[j,i] = beta
             MuArray[j,i] = mu
-            print(str(i*N_Q+j) + ": DQ=" + str(delta) + " and mu=" + str(mu) + " at beta=" + str(beta) + " and target Q=" + str(Qt))
+            print(str(i*N_beta+j) + ": DQ=" + str(delta) + " and mu=" + str(mu) + " at beta=" + str(beta) + " and target Q=" + str(Qt))
             j+=1
         i+=1
 
@@ -80,7 +80,7 @@ def processData(N_Q,N_beta):
     count = 0
     for Ql in Qs.reshape(-1):
          delta = Ql-Qtarget[i%N_Q]
-         if delta > 1e-3:
+         if abs(delta) > 1e-4:
             print(delta)
 
             count+=1
