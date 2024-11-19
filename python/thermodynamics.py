@@ -3,6 +3,8 @@ import cSYK
 from scipy.optimize import fsolve
 import json
 from matplotlib import pyplot as plt
+from numpy.polynomial import polynomial
+import os
 
 def cSYKresults(beta,mu,q):
         
@@ -15,48 +17,56 @@ def Charge(xm,xb,q):
         #print("Q=" +str(result[0]) + ", mu" + str(xm))
         return result[0]
 
-def makeData():
+def makeData(N_Q,N_beta):
 
     q = 4
 
     cSYK.init(30,0)
 
-    N_beta = 20
-    N_Q = 30
-
-    Qs = np.linspace(0,0.30,N_Q,dtype=np.double)
-    betas = np.linspace(20,40,N_beta,dtype=np.double)
+    Qs = np.linspace(0,0.30,N_Q,dtype=np.double,endpoint=False)
+    betas = np.linspace(20,40,N_beta,dtype=np.double,endpoint=False)
 
     FreeArray = np.empty((N_beta,N_Q),dtype=np.double)
     QArray = np.empty((N_beta,N_Q),dtype=np.double)
     BetaArray =  np.empty((N_beta,N_Q),dtype=np.double)
+    MuArray = np.empty((N_beta,N_Q),dtype=np.double)
 
     i = 0
     muQ = 0
-    for Ql in Qs:
+    for Qt in Qs:
         j=0
         mu = muQ
         for beta in betas:
-            mu = fsolve(lambda x: Charge(x,beta,q)-Ql,mu,xtol=1e-7)[0]
+            for p in range(3):
+                mu = fsolve(lambda x: Charge(x,beta,q)-Qt,mu,xtol=1e-7/(10**p))[0]
+                results = cSYKresults(beta,mu,q)
+                delta = Qt-results[0]
+                if (delta < 1e-4):
+                    break
+                print("re-doing point, delta was: " + str(delta))
             if (j==0):
                  muQ=mu
-            results = cSYKresults(beta,mu,q)
+            
             FreeArray[j,i] = results[1]
             QArray[j,i] = results[0]
             BetaArray[j,i] = beta
-            print(Ql-results[0])
+            MuArray[j,i] = mu
+            print(str(i*N_Q+j) + ": DQ=" + str(delta) + " and mu=" + str(mu) + " at beta=" + str(beta) + " and target Q=" + str(Qt))
             j+=1
         i+=1
 
-    output = {"beta": BetaArray.tolist(), "Q": QArray.tolist(), "F": FreeArray.tolist()}
+    output = {"beta": BetaArray.tolist(), "Q": QArray.tolist(), "F": FreeArray.tolist(), "mu": MuArray.tolist()}
     json_obj = json.dumps(output)
     f = open("free_energy.json", "w")
     f.write(json_obj)
     f.close()
 
+    sound = "/System/Library/Sounds/Submarine.aiff"
+    os.system("afplay " + sound)
+
     return
 
-def processData():
+def processData(N_Q,N_beta):
 
     f = open("free_energy.json", "r")
     input = f.read()
@@ -65,8 +75,7 @@ def processData():
     Qs = np.array(results["Q"])
     Fs = np.array(results["F"])
 
-    N_Q = 30
-    Qtarget = np.linspace(0,0.30,N_Q,dtype=np.double)
+    Qtarget = np.linspace(0,0.30,N_Q,dtype=np.double,endpoint=False)
     i=0
     count = 0
     for Ql in Qs.reshape(-1):
@@ -78,14 +87,79 @@ def processData():
          i+=1
     print(count)
 
+    plt.rcParams['text.usetex'] = True
+    plt.rcParams['font.size'] = 15
+
     i=0
-    for Fvec in Fs.swapaxes(0,1):
-        plt.scatter(betas.swapaxes(0,1)[i],Fvec)
+    QPoly = []
+    for Fvec in Fs:
+        QPoly.append(polynomial.polyfit(Qs[i],Fvec,5))
+        plt.scatter(Qs[i],Fvec,label="$\\beta=" + str(betas[i,0])+"$")
+        pol = polynomial.Polynomial(QPoly[-1])
+        plt.plot(Qs[i],pol(Qs[i]))
         i+=1
+    plt.xlabel("$\\mathcal{Q}$")
+    plt.ylabel("$F$")
+    plt.savefig('F_const_beta_lines.pdf',dpi=1000)
     plt.show()
-         
+
+    i=0
+    BPoly = []
+    for Fvec in Fs.swapaxes(0,1):
+        BPoly.append(polynomial.polyfit(betas.swapaxes(0,1)[i],Fvec,5))
+        plt.scatter(betas.swapaxes(0,1)[i],Fvec,label="$Q=" + str(Qs[0,i])+"$")
+        pol = polynomial.Polynomial(BPoly[-1])
+        plt.plot(betas.swapaxes(0,1)[i],pol(betas.swapaxes(0,1)[i]))
+        i+=1
+    plt.xlabel("$\\beta$")
+    plt.ylabel("$F$")
+    plt.savefig('F_const_Q_lines.pdf',dpi=1000)
+    plt.show()
+
+    i=0
+    kappa_inv = []
+    for pol in QPoly:
+        kappa_inv.append(polynomial.Polynomial(pol).deriv(2))
+        derivative = kappa_inv[-1]
+
+        plt.plot(Qs[i],derivative(Qs[i]),label="$\\beta=" + str(betas[i,0])+"$")
+        i+=1
+    plt.xlabel("$\\mathcal{Q}$")
+    plt.ylabel("$\\kappa^{-1}$")
+    plt.savefig('kappa_inv.pdf',dpi=1000)
+    plt.show()
+
+    i=0
+    gamma = []
+    for pol in BPoly:
+        gamma.append(-polynomial.Polynomial(pol).deriv(2))
+        derivative = gamma[-1]
+    
+        plt.plot(betas.swapaxes(0,1)[i],derivative(betas.swapaxes(0,1)[i]),label="$Q=" + str(Qs[0,i])+"$")
+        i+=1
+    plt.xlabel("$\\beta$")
+    plt.ylabel("$\\gamma$")
+    plt.savefig('gamma.pdf',dpi=1000)
+    plt.show()
+
+    i=0
+    mu_num = []
+    for pol in QPoly:
+        mu_num.append(polynomial.Polynomial(pol).deriv(1))
+        derivative = mu_num[-1]
+
+        plt.plot(Qs[i],derivative(Qs[i]),label="$\\beta=" + str(betas[i,0])+"$")
+        i+=1
+    plt.xlabel("$\\mathcal{Q}$")
+    plt.ylabel("$\\mu$")
+    plt.savefig('mu.pdf',dpi=1000)
+    plt.show()
+
     return
 
 if __name__ == "__main__":
 
-    makeData()
+    N_beta = 20
+    N_Q = 30
+
+    makeData(N_Q,N_beta)

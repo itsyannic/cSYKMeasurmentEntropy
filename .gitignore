@@ -5,4 +5,7 @@
 *.DS_Store
 *.ds_store
 *.jpg
+*.json
 *.o
+thermodynamic_quanta/
+thermodynamic_quanta/*
