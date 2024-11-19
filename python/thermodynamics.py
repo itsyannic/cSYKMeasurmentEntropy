@@ -6,6 +6,8 @@ from matplotlib import pyplot as plt
 from numpy.polynomial import polynomial
 import os
 
+maxQerr = 1e-5
+
 def cSYKresults(beta,mu,q):
         
     results = cSYK.solve(beta,mu,q=q,reset=True)
@@ -17,9 +19,7 @@ def Charge(xm,xb,q):
         #print("Q=" +str(result[0]) + ", mu" + str(xm))
         return result[0]
 
-def makeData(N_Q,N_beta):
-
-    q = 4
+def makeData(N_Q,N_beta,q):
 
     cSYK.init(30,0)
 
@@ -41,7 +41,7 @@ def makeData(N_Q,N_beta):
                 mu = fsolve(lambda x: Charge(x,beta,q)-Qt,mu,xtol=1e-7/(10**p))[0]
                 results = cSYKresults(beta,mu,q)
                 delta = Qt-results[0]
-                if (abs(delta) < 1e-4):
+                if (abs(delta) < maxQerr):
                     break
                 print("redoing point, delta was: " + str(delta))
             if (j==0):
@@ -66,7 +66,45 @@ def makeData(N_Q,N_beta):
 
     return
 
-def processData(N_Q,N_beta):
+def repairData(N_Q,N_beta,q):
+    f = open("free_energy.json", "r")
+    input = f.read()
+    results = json.loads(input)
+    betas = np.array(results["beta"])
+    Qs = np.array(results["Q"])
+    Fs = np.array(results["F"])
+    mus = np.array(results["mu"])
+
+    Qtarget = np.linspace(0,0.30,N_Q,dtype=np.double,endpoint=False)
+
+    mu = 0
+    count = 0
+    for i in range(N_Q):
+        for j in range(N_beta):
+            delta = abs(Qs[j,i] - Qtarget[i])
+            if (delta > maxQerr):
+                for p in range(1,4):
+                    mu = fsolve(lambda x: Charge(x,betas[j,i],q)-Qtarget[i],mu,xtol=1e-7/(10**p))[0]
+                    results = cSYKresults(betas[j,i],mu,q)
+                    delta = abs(Qtarget[i]-results[0])
+                    if (delta < maxQerr):
+                        break
+                
+                Fs[j,i] = results[1]
+                Qs[j,i] = results[0]
+                mus[j,i] = mu
+                count += 1
+
+    output = {"beta": betas.tolist(), "Q": Qs.tolist(), "F": Fs.tolist(), "mu": mus.tolist()}
+    json_obj = json.dumps(output)
+    f = open("free_energy.json", "w")
+    f.write(json_obj)
+    f.close()
+    print("corrected " + str(count) + " points")
+
+    return
+
+def processData(N_Q,N_beta,q):
 
     f = open("free_energy.json", "r")
     input = f.read()
@@ -80,7 +118,7 @@ def processData(N_Q,N_beta):
     count = 0
     for Ql in Qs.reshape(-1):
          delta = Ql-Qtarget[i%N_Q]
-         if abs(delta) > 1e-4:
+         if (abs(delta) > maxQerr):
             print(delta)
 
             count+=1
@@ -159,7 +197,9 @@ def processData(N_Q,N_beta):
 
 if __name__ == "__main__":
 
+    q = 4
+
     N_beta = 20
     N_Q = 30
 
-    makeData(N_Q,N_beta)
+    makeData(N_Q,N_beta,q)
