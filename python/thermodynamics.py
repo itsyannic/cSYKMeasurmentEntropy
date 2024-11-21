@@ -8,6 +8,12 @@ import os
 
 maxQerr = 1e-5
 
+def kappa_inv_largeq(beta,Q,q):
+    e = np.log((1-2*Q)/(1+2*Q))/(2*np.pi) + 2*np.pi*Q/(q**2)
+    J = q/np.sqrt( 2*(2+2*np.cosh(2*np.pi*e))**(q/2-1) )
+    return 4/(beta*(1-4*Q**2))+(16*J-4*np.pi**2/beta)/(q**2)
+
+
 def cSYKresults(beta,mu,q):
         
     results = cSYK.solve(beta,mu,q=q,reset=True)
@@ -67,6 +73,9 @@ def makeData(N_Q,N_beta,q):
     return
 
 def repairData(N_Q,N_beta,q):
+
+    cSYK.init(30,0)
+
     f = open("free_energy.json", "r")
     input = f.read()
     results = json.loads(input)
@@ -112,6 +121,7 @@ def processData(N_Q,N_beta,q):
     betas = np.array(results["beta"])
     Qs = np.array(results["Q"])
     Fs = np.array(results["F"])
+    mus = np.array(results["mu"])
 
     Qtarget = np.linspace(0,0.30,N_Q,dtype=np.double,endpoint=False)
     i=0
@@ -193,6 +203,44 @@ def processData(N_Q,N_beta,q):
     plt.savefig('mu.pdf',dpi=1000)
     plt.show()
 
+    i=0
+    QPoly = []
+    for muvec in mus:
+        QPoly.append(polynomial.polyfit(Qs[i],muvec,5))
+        plt.scatter(Qs[i],muvec,label="$\\beta=" + str(betas[i,0])+"$")
+        pol = polynomial.Polynomial(QPoly[-1])
+        plt.plot(Qs[i],pol(Qs[i]))
+        i+=1
+    plt.xlabel("$\\mathcal{Q}$")
+    plt.ylabel("$\\mu$")
+    plt.savefig('mu_const_beta_lines.pdf',dpi=1000)
+    plt.show()
+
+    i=0
+    kappa_inv = []
+    for pol in QPoly:
+        kappa_inv.append(polynomial.Polynomial(pol).deriv(1))
+        derivative = kappa_inv[-1]
+
+        plt.plot(Qs[i],derivative(Qs[i]),label="$\\beta=" + str(betas[i,0])+"$")
+        i+=1
+    plt.xlabel("$\\mathcal{Q}$")
+    plt.ylabel("$\\kappa^{-1}$")
+    plt.savefig('kappa_inv.pdf',dpi=1000)
+    plt.show()
+    
+    i = int(N_beta/2)
+    kappa_inv_theory = kappa_inv_largeq(betas[i,0],Qs[i],q)
+    derivative = kappa_inv[int(N_beta/2)]
+    plt.plot(Qs[i],derivative(Qs[i]),label="numerical")
+    plt.plot(Qs[i],kappa_inv_theory,label="large $q$")
+    plt.title("$\\beta=" + str(betas[i,0])+"$")
+    plt.xlabel("$\\mathcal{Q}$")
+    plt.ylabel("$\\kappa^{-1}$")
+    plt.legend()
+    plt.savefig('kappa_inv_beta=30.pdf',dpi=1000)
+    plt.show()
+
     return
 
 if __name__ == "__main__":
@@ -202,4 +250,4 @@ if __name__ == "__main__":
     N_beta = 20
     N_Q = 30
 
-    repairData(N_Q,N_beta,q)
+    processData(N_Q,N_beta,q)
