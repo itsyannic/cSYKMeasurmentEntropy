@@ -25,16 +25,21 @@ def Charge(xm,xb,q):
         #print("Q=" +str(result[0]) + ", mu" + str(xm))
         return result[0]
 
-def makeData(N_Q,N_beta,q):
+def makeData(N_Q,N_beta,q,invertbeta=True):
 
     cSYK.init(30,0)
 
     Qs = np.linspace(0,0.30,N_Q,dtype=np.double,endpoint=False)
     betas = np.linspace(20,40,N_beta,dtype=np.double,endpoint=False)
+    Ts = np.reciprocal(betas)
+    if invertbeta:
+        Ts = np.linspace(0.02,0.04,N_beta,dtype=np.double,endpoint=False)
+        betas = np.reciprocal(Ts)
 
     FreeArray = np.empty((N_beta,N_Q),dtype=np.double)
     QArray = np.empty((N_beta,N_Q),dtype=np.double)
     BetaArray =  np.empty((N_beta,N_Q),dtype=np.double)
+    TArray = np.empty((N_beta,N_Q),dtype=np.double)
     MuArray = np.empty((N_beta,N_Q),dtype=np.double)
 
     i = 0
@@ -56,12 +61,13 @@ def makeData(N_Q,N_beta,q):
             FreeArray[j,i] = results[1]
             QArray[j,i] = results[0]
             BetaArray[j,i] = beta
+            TArray[j,i] = 1/beta
             MuArray[j,i] = mu
             print(str(i*N_beta+j) + ": DQ=" + str(delta) + " and mu=" + str(mu) + " at beta=" + str(beta) + " and target Q=" + str(Qt))
             j+=1
         i+=1
 
-    output = {"beta": BetaArray.tolist(), "Q": QArray.tolist(), "F": FreeArray.tolist(), "mu": MuArray.tolist()}
+    output = {"beta": BetaArray.tolist(), "T": TArray.tolist(), "Q": QArray.tolist(), "F": FreeArray.tolist(), "mu": MuArray.tolist()}
     json_obj = json.dumps(output)
     f = open("free_energy.json", "w")
     f.write(json_obj)
@@ -80,6 +86,7 @@ def repairData(N_Q,N_beta,q):
     input = f.read()
     results = json.loads(input)
     betas = np.array(results["beta"])
+    Ts = np.array(results["T"])
     Qs = np.array(results["Q"])
     Fs = np.array(results["F"])
     mus = np.array(results["mu"])
@@ -92,7 +99,7 @@ def repairData(N_Q,N_beta,q):
         for j in range(N_beta):
             delta = abs(Qs[j,i] - Qtarget[i])
             if (delta > maxQerr):
-                for p in range(1,4):
+                for p in range(1,5):
                     mu = fsolve(lambda x: Charge(x,betas[j,i],q)-Qtarget[i],mu,xtol=1e-7/(10**p))[0]
                     results = cSYKresults(betas[j,i],mu,q)
                     delta = abs(Qtarget[i]-results[0])
@@ -104,7 +111,7 @@ def repairData(N_Q,N_beta,q):
                 mus[j,i] = mu
                 count += 1
 
-    output = {"beta": betas.tolist(), "Q": Qs.tolist(), "F": Fs.tolist(), "mu": mus.tolist()}
+    output = {"beta": betas.tolist(), "T": Ts.tolist(), "Q": Qs.tolist(), "F": Fs.tolist(), "mu": mus.tolist()}
     json_obj = json.dumps(output)
     f = open("free_energy.json", "w")
     f.write(json_obj)
@@ -119,9 +126,12 @@ def processData(N_Q,N_beta,q):
     input = f.read()
     results = json.loads(input)
     betas = np.array(results["beta"])
+    Ts = np.reciprocal(betas)
     Qs = np.array(results["Q"])
-    Fs = np.array(results["F"])
+    Omegas = np.array(results["F"])
     mus = np.array(results["mu"])
+
+    Fs = Omegas + mus*Qs + mus/2
 
     Qtarget = np.linspace(0,0.30,N_Q,dtype=np.double,endpoint=False)
     i=0
@@ -137,6 +147,15 @@ def processData(N_Q,N_beta,q):
 
     plt.rcParams['text.usetex'] = True
     plt.rcParams['font.size'] = 15
+
+    i=0
+    for OmegaVec in Omegas:
+        plt.scatter(Qs[i],OmegaVec,label="$\\beta=" + str(betas[i,0])+"$")
+        i+=1
+    plt.xlabel("$\\mathcal{Q}$")
+    plt.ylabel("$\\Omega$")
+    plt.savefig('omega_const_beta_lines.pdf',dpi=1000)
+    plt.show()
 
     i=0
     QPoly = []
@@ -174,7 +193,7 @@ def processData(N_Q,N_beta,q):
         i+=1
     plt.xlabel("$\\mathcal{Q}$")
     plt.ylabel("$\\kappa^{-1}$")
-    plt.savefig('kappa_inv.pdf',dpi=1000)
+    plt.savefig('kappa_inv_1.pdf',dpi=1000)
     plt.show()
 
     i=0
@@ -226,7 +245,7 @@ def processData(N_Q,N_beta,q):
         i+=1
     plt.xlabel("$\\mathcal{Q}$")
     plt.ylabel("$\\kappa^{-1}$")
-    plt.savefig('kappa_inv.pdf',dpi=1000)
+    plt.savefig('kappa_inv_2.pdf',dpi=1000)
     plt.show()
     
     i = int(N_beta/2)
@@ -240,6 +259,11 @@ def processData(N_Q,N_beta,q):
     plt.legend()
     plt.savefig('kappa_inv_beta=30.pdf',dpi=1000)
     plt.show()
+
+    print(kappa_inv[-1])
+    print(gamma[-1])
+
+
 
     return
 
