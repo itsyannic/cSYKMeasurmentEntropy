@@ -6,7 +6,7 @@ from matplotlib import pyplot as plt
 from numpy.polynomial import polynomial
 import os
 
-maxQerr = 1e-6
+maxQerr = 1e-7
 
 def kappa_inv_largeq(beta,Q,q):
     e = np.log((1-2*Q)/(1+2*Q))/(2*np.pi) + 2*np.pi*Q/(q**2)
@@ -309,4 +309,4 @@ if __name__ == "__main__":
     N_beta = 20
     N_Q = 30
 
-    repairData(N_Q,N_beta,q)
+    processData(N_Q,N_beta,q)

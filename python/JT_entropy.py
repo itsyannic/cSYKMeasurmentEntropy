@@ -1,5 +1,75 @@
 import numpy as np
 import scipy as sc
+import json
+
+def kappa_inv_largeq(beta,Q,q):
+    e = np.log((1-2*Q)/(1+2*Q))/(2*np.pi) + 2*np.pi*Q/(q**2)
+    J = q/np.sqrt( 2*(2+2*np.cosh(2*np.pi*e))**(q/2-1) )
+    return 4/(beta*(1-4*Q**2))+(16*J-4*np.pi**2/beta)/(q**2)
+
+class cSYK_termodynamics:
+    init = 0
+
+    _kappa_inv_coef = []
+    _gamma_coef = []
+
+    _deg_kappa = 0
+    _deg_gamma = 0
+
+    @classmethod
+    def _initialize(cls):
+
+        f = open("gamma_kappa_coef.json", "r")
+        input = f.read()
+        coefs = json.loads(input)
+        gamma_arr = np.array(coefs["gamma"])
+        kappa_inv_arr = np.array(coefs["kappa_inv"])
+
+        for vector in kappa_inv_arr:
+            pol = np.polynomial.polynomial.Polynomial(vector)
+            cls._kappa_inv_coef.append(pol)
+
+        cls._deg_kappa = len(cls._kappa_inv_coef)
+
+        for vector in gamma_arr:
+            pol = np.polynomial.polynomial.Polynomial(vector)
+            cls._gamma_coef.append(pol)
+
+        cls._deg_gamma = len(cls._gamma_coef)
+
+        cls.init = 1
+        return
+    
+    @classmethod
+    def kappa_inv(cls,Q,beta):
+
+        if (not cls.init):
+            cls._initialize()
+            cls.init = 1
+
+        coef = []
+        for polynomial in cls._kappa_inv_coef:
+            coef.append(polynomial(1/beta))
+
+        polynomial = np.polynomial.polynomial.Polynomial(coef)
+
+        return polynomial(Q)
+
+    @classmethod
+    def gamma(cls,Q,beta):
+        
+        if (not cls.init):
+            cls._initialize()
+            cls.init = 1
+
+        coef = []
+        for polynomial in cls._gamma_coef:
+            coef.append(polynomial(Q))
+
+        polynomial = np.polynomial.polynomial.Polynomial(coef)
+
+        return polynomial(1/beta)
+    
 
 def beta_times_curly_J(q,beta,e,J):
 
@@ -78,6 +148,17 @@ def S_gen(Q,m,q,beta,J):
 
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
+
+    Qx = np.linspace(0,0.35,100)
+    plt.plot(Qx, [cSYK_termodynamics.kappa_inv(Q,30) for Q in Qx],label="numerical")
+    kappa_inv_theory = kappa_inv_largeq(30,Qx,4)
+    plt.plot(Qx,kappa_inv_theory,label="large $q$")
+    plt.title("$\\beta=30$")
+    plt.xlabel("$\\mathcal{Q}$")
+    plt.ylabel("$\\kappa^{-1}$")
+    plt.legend()
+    plt.savefig('kappa_inv_beta=30.pdf',dpi=1000)
+    plt.show()
 
     Qx = np.linspace(0,0.49,100)
     S_0 = np.array([_S_0(Qx[i],4,1) for i in range(len(Qx))])
