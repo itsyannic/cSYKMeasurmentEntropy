@@ -6,7 +6,7 @@ from matplotlib import pyplot as plt
 from numpy.polynomial import polynomial
 import os
 
-maxQerr = 1e-5
+maxQerr = 1e-6
 
 def kappa_inv_largeq(beta,Q,q):
     e = np.log((1-2*Q)/(1+2*Q))/(2*np.pi) + 2*np.pi*Q/(q**2)
@@ -99,7 +99,7 @@ def repairData(N_Q,N_beta,q):
         for j in range(N_beta):
             delta = abs(Qs[j,i] - Qtarget[i])
             if (delta > maxQerr):
-                for p in range(1,5):
+                for p in range(1,6):
                     mu = fsolve(lambda x: Charge(x,betas[j,i],q)-Qtarget[i],mu,xtol=1e-7/(10**p))[0]
                     results = cSYKresults(betas[j,i],mu,q)
                     delta = abs(Qtarget[i]-results[0])
@@ -131,6 +131,12 @@ def processData(N_Q,N_beta,q):
     Omegas = np.array(results["F"])
     mus = np.array(results["mu"])
 
+    degBeta = 3
+    degQ = 4
+
+    kappa_inv_coef = np.empty((N_beta,degQ-1),dtype=np.double)
+    gamma_coef = np.empty((N_Q,degBeta-1),dtype=np.double)
+
     Fs = Omegas + mus*Qs + mus/2
 
     Qtarget = np.linspace(0,0.30,N_Q,dtype=np.double,endpoint=False)
@@ -150,7 +156,7 @@ def processData(N_Q,N_beta,q):
 
     i=0
     for OmegaVec in Omegas:
-        plt.scatter(Qs[i],OmegaVec,label="$\\beta=" + str(betas[i,0])+"$")
+        plt.scatter(Qs[i],OmegaVec,label="$T=" + str(Ts[i,0])+"$")
         i+=1
     plt.xlabel("$\\mathcal{Q}$")
     plt.ylabel("$\\Omega$")
@@ -161,7 +167,7 @@ def processData(N_Q,N_beta,q):
     QPoly = []
     for Fvec in Fs:
         QPoly.append(polynomial.polyfit(Qs[i],Fvec,5))
-        plt.scatter(Qs[i],Fvec,label="$\\beta=" + str(betas[i,0])+"$")
+        plt.scatter(Qs[i],Fvec,label="$T=" + str(Ts[i,0])+"$")
         pol = polynomial.Polynomial(QPoly[-1])
         plt.plot(Qs[i],pol(Qs[i]))
         i+=1
@@ -171,14 +177,14 @@ def processData(N_Q,N_beta,q):
     plt.show()
 
     i=0
-    BPoly = []
+    TPoly = []
     for Fvec in Fs.swapaxes(0,1):
-        BPoly.append(polynomial.polyfit(betas.swapaxes(0,1)[i],Fvec,5))
-        plt.scatter(betas.swapaxes(0,1)[i],Fvec,label="$Q=" + str(Qs[0,i])+"$")
-        pol = polynomial.Polynomial(BPoly[-1])
-        plt.plot(betas.swapaxes(0,1)[i],pol(betas.swapaxes(0,1)[i]))
+        TPoly.append(polynomial.polyfit(Ts.swapaxes(0,1)[i],Fvec,degBeta))
+        plt.scatter(Ts.swapaxes(0,1)[i],Fvec,label="$Q=" + str(Qs[0,i])+"$")
+        pol = polynomial.Polynomial(TPoly[-1])
+        plt.plot(Ts.swapaxes(0,1)[i],pol(Ts.swapaxes(0,1)[i]))
         i+=1
-    plt.xlabel("$\\beta$")
+    plt.xlabel("$T$")
     plt.ylabel("$F$")
     plt.savefig('F_const_Q_lines.pdf',dpi=1000)
     plt.show()
@@ -189,7 +195,7 @@ def processData(N_Q,N_beta,q):
         kappa_inv.append(polynomial.Polynomial(pol).deriv(2))
         derivative = kappa_inv[-1]
 
-        plt.plot(Qs[i],derivative(Qs[i]),label="$\\beta=" + str(betas[i,0])+"$")
+        plt.plot(Qs[i],derivative(Qs[i]),label="$T=" + str(Ts[i,0])+"$")
         i+=1
     plt.xlabel("$\\mathcal{Q}$")
     plt.ylabel("$\\kappa^{-1}$")
@@ -198,13 +204,14 @@ def processData(N_Q,N_beta,q):
 
     i=0
     gamma = []
-    for pol in BPoly:
+    for pol in TPoly:
         gamma.append(-polynomial.Polynomial(pol).deriv(2))
+        gamma_coef[i] = gamma[-1].coef
         derivative = gamma[-1]
     
-        plt.plot(betas.swapaxes(0,1)[i],derivative(betas.swapaxes(0,1)[i]),label="$Q=" + str(Qs[0,i])+"$")
+        plt.plot(Ts.swapaxes(0,1)[i],derivative(Ts.swapaxes(0,1)[i]),label="$Q=" + str(Qs[0,i])+"$")
         i+=1
-    plt.xlabel("$\\beta$")
+    plt.xlabel("$T$")
     plt.ylabel("$\\gamma$")
     plt.savefig('gamma.pdf',dpi=1000)
     plt.show()
@@ -215,7 +222,7 @@ def processData(N_Q,N_beta,q):
         mu_num.append(polynomial.Polynomial(pol).deriv(1))
         derivative = mu_num[-1]
 
-        plt.plot(Qs[i],derivative(Qs[i]),label="$\\beta=" + str(betas[i,0])+"$")
+        plt.plot(Qs[i],derivative(Qs[i]),label="$T=" + str(Ts[i,0])+"$")
         i+=1
     plt.xlabel("$\\mathcal{Q}$")
     plt.ylabel("$\\mu$")
@@ -225,8 +232,8 @@ def processData(N_Q,N_beta,q):
     i=0
     QPoly = []
     for muvec in mus:
-        QPoly.append(polynomial.polyfit(Qs[i],muvec,5))
-        plt.scatter(Qs[i],muvec,label="$\\beta=" + str(betas[i,0])+"$")
+        QPoly.append(polynomial.polyfit(Qs[i],muvec,degQ-1))
+        plt.scatter(Qs[i],muvec,label="$T=" + str(Ts[i,0])+"$")
         pol = polynomial.Polynomial(QPoly[-1])
         plt.plot(Qs[i],pol(Qs[i]))
         i+=1
@@ -239,9 +246,10 @@ def processData(N_Q,N_beta,q):
     kappa_inv = []
     for pol in QPoly:
         kappa_inv.append(polynomial.Polynomial(pol).deriv(1))
+        kappa_inv_coef[i] = kappa_inv[-1].coef
         derivative = kappa_inv[-1]
 
-        plt.plot(Qs[i],derivative(Qs[i]),label="$\\beta=" + str(betas[i,0])+"$")
+        plt.plot(Qs[i],derivative(Qs[i]),label="$T=" + str(Ts[i,0])+"$")
         i+=1
     plt.xlabel("$\\mathcal{Q}$")
     plt.ylabel("$\\kappa^{-1}$")
@@ -253,17 +261,44 @@ def processData(N_Q,N_beta,q):
     derivative = kappa_inv[int(N_beta/2)]
     plt.plot(Qs[i],derivative(Qs[i]),label="numerical")
     plt.plot(Qs[i],kappa_inv_theory,label="large $q$")
-    plt.title("$\\beta=" + str(betas[i,0])+"$")
+    plt.title("$T=" + str(Ts[i,0])+"$")
     plt.xlabel("$\\mathcal{Q}$")
     plt.ylabel("$\\kappa^{-1}$")
     plt.legend()
-    plt.savefig('kappa_inv_beta=30.pdf',dpi=1000)
+    plt.savefig('kappa_inv_'+str(betas[i,0])+'=30.pdf',dpi=1000)
     plt.show()
 
-    print(kappa_inv[-1])
-    print(gamma[-1])
+
+    kappa_inv = np.empty((degQ-1,degBeta-1),dtype=np.double)
+    for i in range(degQ-1):
+        pol = polynomial.polyfit(Ts[:,0],kappa_inv_coef[:,i],degBeta-2)
+        kappa_inv[i] = pol
+        plt.scatter(Ts[:,0],kappa_inv_coef[:,i],label="c"+str(i))
+        plt.plot(Ts[:,0],polynomial.Polynomial(pol)(Ts[:,0]))
+    plt.title("$\\kappa^{-1}$ coefficients")
+    plt.legend()
+    plt.xlabel("$T$")
+    plt.savefig('kappa_inv_coef.pdf',dpi=1000)
+    plt.show()
+
+    gamma = np.empty((degBeta-1,degQ-1),dtype=np.double)
+    for i in range(degBeta-1):
+        pol = polynomial.polyfit(Qs[0,:],gamma_coef[:,i],degQ-2)
+        gamma[i] = pol
+        plt.scatter(Qs[0,:],gamma_coef[:,i],label="c"+str(i))
+        plt.plot(Qs[0,:],polynomial.Polynomial(pol)(Qs[0,:]))
+    plt.title("$\\gamma$ coefficients")
+    plt.legend()
+    plt.xlabel("$\\mathcal{Q}$")
+    plt.savefig('gamma_coef.pdf',dpi=1000)
+    plt.show()
 
 
+    output = {"gamma": gamma.tolist(), "kappa_inv": kappa_inv.tolist()}
+    json_obj = json.dumps(output)
+    f = open("gamma_kappa_coef.json", "w")
+    f.write(json_obj)
+    f.close()
 
     return
 
@@ -274,4 +309,4 @@ if __name__ == "__main__":
     N_beta = 20
     N_Q = 30
 
-    processData(N_Q,N_beta,q)
+    repairData(N_Q,N_beta,q)
