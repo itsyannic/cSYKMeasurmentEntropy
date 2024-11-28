@@ -135,6 +135,7 @@ def processData(N_Q,N_beta,q):
     degQ = 4
 
     kappa_inv_coef = np.empty((N_beta,degQ-1),dtype=np.double)
+    mu_coef = np.empty((N_beta,degQ),dtype=np.double)
     gamma_coef = np.empty((N_Q,degBeta-1),dtype=np.double)
 
     Fs = Omegas + mus*Qs + mus/2
@@ -234,6 +235,7 @@ def processData(N_Q,N_beta,q):
     for muvec in mus:
         QPoly.append(polynomial.polyfit(Qs[i],muvec,degQ-1))
         plt.scatter(Qs[i],muvec,label="$T=" + str(Ts[i,0])+"$")
+        mu_coef[i] = QPoly[-1]
         pol = polynomial.Polynomial(QPoly[-1])
         plt.plot(Qs[i],pol(Qs[i]))
         i+=1
@@ -268,6 +270,18 @@ def processData(N_Q,N_beta,q):
     plt.savefig('kappa_inv_'+str(betas[i,0])+'=30.pdf',dpi=1000)
     plt.show()
 
+    mu = np.empty((degQ,degBeta-1),dtype=np.double)
+    for i in range(degQ):
+        pol = polynomial.polyfit(Ts[:,0],mu_coef[:,i],degBeta-2)
+        mu[i] = pol
+        plt.scatter(Ts[:,0],mu_coef[:,i],label="c"+str(i))
+        plt.plot(Ts[:,0],polynomial.Polynomial(pol)(Ts[:,0]))
+    plt.title("$\\mu$ coefficients")
+    plt.legend()
+    plt.xlabel("$T$")
+    plt.savefig('mu_coef.pdf',dpi=1000)
+    plt.show()
+
 
     kappa_inv = np.empty((degQ-1,degBeta-1),dtype=np.double)
     for i in range(degQ-1):
@@ -294,7 +308,7 @@ def processData(N_Q,N_beta,q):
     plt.show()
 
 
-    output = {"gamma": gamma.tolist(), "kappa_inv": kappa_inv.tolist()}
+    output = {"gamma": gamma.tolist(), "kappa_inv": kappa_inv.tolist(), "mu": mu.tolist()}
     json_obj = json.dumps(output)
     f = open("gamma_kappa_coef.json", "w")
     f.write(json_obj)

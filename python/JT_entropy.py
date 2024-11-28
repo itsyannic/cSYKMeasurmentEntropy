@@ -7,14 +7,23 @@ def kappa_inv_largeq(beta,Q,q):
     J = q/np.sqrt( 2*(2+2*np.cosh(2*np.pi*e))**(q/2-1) )
     return 4/(beta*(1-4*Q**2))+(16*J-4*np.pi**2/beta)/(q**2)
 
+def mu_largeq(beta,Q,q):
+
+    e = np.log((1-2*Q)/(1+2*Q))/(2*np.pi) + 2*np.pi*Q/(q**2)
+    J = q/np.sqrt( 2*(2+2*np.cosh(2*np.pi*e))**(q/2-1) )
+
+    return 16*J*Q/q**2 - 2*np.pi*e/beta
+
 class cSYK_termodynamics:
     init = 0
 
     _kappa_inv_coef = []
     _gamma_coef = []
+    _mu_coef = []
 
     _deg_kappa = 0
     _deg_gamma = 0
+    _deg_mu = 0
 
     @classmethod
     def _initialize(cls):
@@ -24,6 +33,13 @@ class cSYK_termodynamics:
         coefs = json.loads(input)
         gamma_arr = np.array(coefs["gamma"])
         kappa_inv_arr = np.array(coefs["kappa_inv"])
+        mu_arr = np.array(coefs["mu"])
+
+        for vector in mu_arr:
+            pol = np.polynomial.polynomial.Polynomial(vector)
+            cls._mu_coef.append(pol)
+
+        cls._deg_mu = len(cls._mu_coef)
 
         for vector in kappa_inv_arr:
             pol = np.polynomial.polynomial.Polynomial(vector)
@@ -39,6 +55,21 @@ class cSYK_termodynamics:
 
         cls.init = 1
         return
+    
+    @classmethod
+    def mu(cls,Q,beta):
+
+        if (not cls.init):
+            cls._initialize()
+            cls.init = 1
+
+        coef = []
+        for polynomial in cls._mu_coef:
+            coef.append(polynomial(1/beta))
+
+        polynomial = np.polynomial.polynomial.Polynomial(coef)
+
+        return polynomial(Q)
     
     @classmethod
     def kappa_inv(cls,Q,beta):
@@ -74,19 +105,10 @@ class cSYK_termodynamics:
 def beta_times_curly_J(q,beta,e,J):
 
     return q*J/np.sqrt(2*(2+2*np.cosh(2*np.pi*e))**(q/2.0-1.0))*beta
-
-def theta(Q,q):
-
-    theta = sc.optimize.fsolve(lambda x: Q + x/np.pi+(0.5-1/q)*np.sin(2*x)/np.sin(2*np.pi/q), [-np.pi/q,np.pi/q], xtol=1e-16)
-
-    for t in theta:
-        if (t>-np.pi/q) and (t<np.pi/q):
-            return t
-        return 0
     
 def _curly_E(Q,q):
-    t = theta(Q,q)
-    return np.log(np.sin(np.pi/q+t)/np.sin(np.pi/q-t))/(2*np.pi)
+    
+    return -(8*np.pi*Q)/(3*q^3) + (2*np.pi*Q)/q**2 + ((16*Q*np.pi**3)/5 - (448*np.pi**3*Q**3)/15)/q**5 + (-((2*np.pi**3*Q)/3) + 8*np.pi**3*Q**3)/q**4 + np.log(-1 + 2/(1 + 2*Q))/(2*np.pi)
 
 def integrand(x,epsilon):
     return 2*np.pi*x*np.sin(2*np.pi*x)/(np.cosh(2*np.pi*epsilon)-np.cos(2*np.pi*x))
@@ -158,6 +180,14 @@ if __name__ == '__main__':
     plt.ylabel("$\\kappa^{-1}$")
     plt.legend()
     plt.savefig('kappa_inv_beta=30.pdf',dpi=1000)
+    plt.show()
+
+    plt.plot(Qx, [cSYK_termodynamics.mu(Q,30) for Q in Qx],label="numerical")
+    mu_theory = mu_largeq(30,Qx,4)
+    plt.plot(Qx,mu_theory,label="large $q$")
+    plt.ylabel("$\\mu$")
+    plt.legend()
+    plt.savefig('mu_beta=30.pdf',dpi=1000)
     plt.show()
 
     Qx = np.linspace(0,0.49,100)
