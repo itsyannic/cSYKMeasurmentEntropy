@@ -131,7 +131,7 @@ def processData(N_Q,N_beta,q):
     Omegas = np.array(results["F"])
     mus = np.array(results["mu"])
 
-    degBeta = 3
+    degBeta = 2
     degQ = 4
 
     kappa_inv_coef = np.empty((N_beta,degQ-1),dtype=np.double)
@@ -270,9 +270,9 @@ def processData(N_Q,N_beta,q):
     plt.savefig('kappa_inv_'+str(betas[i,0])+'=30.pdf',dpi=1000)
     plt.show()
 
-    mu = np.empty((degQ,degBeta-1),dtype=np.double)
+    mu = np.empty((degQ,degBeta+1),dtype=np.double)
     for i in range(degQ):
-        pol = polynomial.polyfit(Ts[:,0],mu_coef[:,i],degBeta-2)
+        pol = polynomial.polyfit(Ts[:,0],mu_coef[:,i],degBeta)
         mu[i] = pol
         plt.scatter(Ts[:,0],mu_coef[:,i],label="c"+str(i))
         plt.plot(Ts[:,0],polynomial.Polynomial(pol)(Ts[:,0]))
@@ -283,9 +283,9 @@ def processData(N_Q,N_beta,q):
     plt.show()
 
 
-    kappa_inv = np.empty((degQ-1,degBeta-1),dtype=np.double)
+    kappa_inv = np.empty((degQ-1,degBeta+1),dtype=np.double)
     for i in range(degQ-1):
-        pol = polynomial.polyfit(Ts[:,0],kappa_inv_coef[:,i],degBeta-2)
+        pol = polynomial.polyfit(Ts[:,0],kappa_inv_coef[:,i],degBeta)
         kappa_inv[i] = pol
         plt.scatter(Ts[:,0],kappa_inv_coef[:,i],label="c"+str(i))
         plt.plot(Ts[:,0],polynomial.Polynomial(pol)(Ts[:,0]))
@@ -295,9 +295,9 @@ def processData(N_Q,N_beta,q):
     plt.savefig('kappa_inv_coef.pdf',dpi=1000)
     plt.show()
 
-    gamma = np.empty((degBeta-1,degQ-1),dtype=np.double)
+    gamma = np.empty((degBeta-1,degQ+1),dtype=np.double)
     for i in range(degBeta-1):
-        pol = polynomial.polyfit(Qs[0,:],gamma_coef[:,i],degQ-2)
+        pol = polynomial.polyfit(Qs[0,:],gamma_coef[:,i],degQ)
         gamma[i] = pol
         plt.scatter(Qs[0,:],gamma_coef[:,i],label="c"+str(i))
         plt.plot(Qs[0,:],polynomial.Polynomial(pol)(Qs[0,:]))

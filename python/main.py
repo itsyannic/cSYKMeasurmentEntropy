@@ -50,14 +50,13 @@ if (generate_data):
     output = open(filebase + '_data.out', "w")
     output.write(json_obj)
     output.close()
+    sound = "/System/Library/Sounds/Submarine.aiff"
+    os.system("afplay " + sound)
 else:
     file = open(filebase + '_data.out', "r")
     input = file.read()
     results = json.loads(input)['data']
     file.close()
-
-sound = "/System/Library/Sounds/Submarine.aiff"
-os.system("afplay " + sound)
 
 #plot data
 m = np.array([point['m'] for point in results],dtype=np.double)
@@ -72,6 +71,7 @@ plt.scatter(m,I,label="complex SYK")
 plt.plot(m,JT,label="charged JT")
 plt.xlabel('$m$')
 plt.ylabel('$S$')
+plt.ylim(0,0.55)
 plt.title('$\\beta = ' + str(beta) + '$, $q=' + str(q) +'$')
 plt.legend(loc="upper right")
 plt.savefig(filebase + '.pdf',dpi=1000)

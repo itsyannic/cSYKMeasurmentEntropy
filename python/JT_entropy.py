@@ -14,6 +14,13 @@ def mu_largeq(beta,Q,q):
 
     return 16*J*Q/q**2 - 2*np.pi*e/beta
 
+def gamma_largeq(beta,Q,q):
+
+    e = np.log((1-2*Q)/(1+2*Q))/(2*np.pi) + 2*np.pi*Q/(q**2)
+    J = q/np.sqrt( 2*(2+2*np.cosh(2*np.pi*e))**(q/2-1) )
+
+    return 2*np.pi**2*(1-4*Q**2)/(J*q**2)
+
 class cSYK_termodynamics:
     init = 0
 
@@ -72,6 +79,22 @@ class cSYK_termodynamics:
         return polynomial(Q)
     
     @classmethod
+    def dmu_dT(cls,Q,beta):
+
+        if (not cls.init):
+            cls._initialize()
+            cls.init = 1
+
+        coef = []
+        for polynomial in cls._mu_coef:
+            der = polynomial.deriv(1)
+            coef.append(der(1/beta))
+
+        polynomial = np.polynomial.polynomial.Polynomial(coef)
+
+        return polynomial(Q)
+    
+    @classmethod
     def kappa_inv(cls,Q,beta):
 
         if (not cls.init):
@@ -81,6 +104,22 @@ class cSYK_termodynamics:
         coef = []
         for polynomial in cls._kappa_inv_coef:
             coef.append(polynomial(1/beta))
+
+        polynomial = np.polynomial.polynomial.Polynomial(coef)
+
+        return polynomial(Q)
+    
+    @classmethod
+    def dkappa_inv_dT(cls,Q,beta):
+
+        if (not cls.init):
+            cls._initialize()
+            cls.init = 1
+
+        coef = []
+        for polynomial in cls._kappa_inv_coef:
+            der = polynomial.deriv(1)
+            coef.append(der(1/beta))
 
         polynomial = np.polynomial.polynomial.Polynomial(coef)
 
@@ -102,61 +141,39 @@ class cSYK_termodynamics:
         return polynomial(1/beta)
     
 
-def beta_times_curly_J(q,beta,e,J):
+def _beta_times_curly_J(q,beta,e,J):
 
     return q*J/np.sqrt(2*(2+2*np.cosh(2*np.pi*e))**(q/2.0-1.0))*beta
     
 def _curly_E(Q,q):
     
-    return -(8*np.pi*Q)/(3*q^3) + (2*np.pi*Q)/q**2 + ((16*Q*np.pi**3)/5 - (448*np.pi**3*Q**3)/15)/q**5 + (-((2*np.pi**3*Q)/3) + 8*np.pi**3*Q**3)/q**4 + np.log(-1 + 2/(1 + 2*Q))/(2*np.pi)
+    return -(8*np.pi*Q)/(3*q**3) + (2*np.pi*Q)/q**2 + ((16*Q*np.pi**3)/5 - (448*np.pi**3*Q**3)/15)/q**5 + (-((2*np.pi**3*Q)/3) + 8*np.pi**3*Q**3)/q**4 + np.log(-1 + 2/(1 + 2*Q))/(2*np.pi)
 
-def integrand(x,epsilon):
+def _integrand(x,epsilon):
     return 2*np.pi*x*np.sin(2*np.pi*x)/(np.cosh(2*np.pi*epsilon)-np.cos(2*np.pi*x))
 
 def _S_0(Q,q,e):
 
-    return 0.47138 + sc.integrate.quad(lambda x: 2*np.pi*_curly_E(x,q), 0, Q)[0]
-
-def _I_JT(Q,beta,q,J):
-    e = _curly_E(Q,q)
-    betaJ = beta_times_curly_J(q,beta,e,J)
-    return -(q*np.pi*e)**2/(8*betaJ) - np.pi**2/(betaJ*q**2)
+    return 0.435 + sc.integrate.quad(lambda x: 2*np.pi*_curly_E(x,q), 0, Q)[0]
+    #return (2*np.pi**2*(1 - 4*Q**2))/(3*q**3) + (np.pi**2*(-1 + 4*Q**2))/(2*q**2) + (2*np.pi**4*(1 + 24*Q**2 - 112*Q**4))/(15*q**5) + (np.pi**4*(-1 - 8*Q**2 + 48*Q**4))/(12*q**4) + (1/2)*np.log(4/(1 - 4*Q**2)) + Q*np.log(-1 + 2/(1 + 2*Q))
 
 def _S_JT(Q,beta,q,J):
 
-    dQ = np.double(1e-12)
-    dbeta = np.double(1e-12)
+    e = _curly_E(Q,q)
 
-    I_JT = _I_JT(Q,beta,q,J)
-    dI_JT = [_I_JT(Q+dQ,beta,q,J),_I_JT(Q,beta+dbeta,q,J),_I_JT(Q+dQ,beta+dbeta,q,J),
-             _I_JT(Q-dQ,beta,q,J),_I_JT(Q,beta-dbeta,q,J),_I_JT(Q-dQ,beta-dbeta,q,J),
-             _I_JT(Q+dQ,beta-dbeta,q,J), _I_JT(Q-dQ,beta+dbeta,q,J)]
-    F = -I_JT/beta
-    dF = [dI_JT[0]/beta,0,dI_JT[2]/(beta+dbeta),
-          dI_JT[3]/beta,0,dI_JT[5]/(beta-dbeta),
-          dI_JT[6]/(beta-dbeta),dI_JT[7]/(beta+dbeta)]
-    
-    dIdQ = (dI_JT[0]-dI_JT[3])/(2*dQ)
-    dIdB = (dI_JT[1]-dI_JT[4])/(2*dbeta)
-    dFdQQ = (-dF[0]-dF[3]+2*F)/(dQ**2)
-    dFdQdB = (dF[3]+dF[5]-dF[6]-dF[7])/(4*dQ*dbeta)
+    gamma = cSYK_termodynamics.gamma(Q,beta)
+    kappa = 1/cSYK_termodynamics.kappa_inv(Q,beta)
+    dkappa = -cSYK_termodynamics.dkappa_inv_dT(Q,beta)*kappa**2
+    dmu = cSYK_termodynamics.dmu_dT(Q,beta)
 
-    return -I_JT+beta*(dIdB-dIdQ*dFdQdB/dFdQQ)
+    I_JT = -gamma/(2*beta) - 2*np.pi**2*e**2*kappa/(beta)
 
-def _S_Gravity(Q,q,beta_x_curlyJ,e):
-
-    return np.pi**2*(q-2)*np.tanh(np.pi*e)/(2*beta_x_curlyJ*q**2*(1-4*Q**2))
-
-def _S_Gauge(Q,q,beta_x_curlyJ,e):
-
-    return (q*np.pi*e/2)**2/beta_x_curlyJ*(1+e**2/beta_x_curlyJ*(4+np.pi*e*(q-2)*np.tanh(np.pi*e))/( 4+16/q**2*beta_x_curlyJ*(1-4*Q**2+Q*(q-2)*np.tanh(np.pi*e)) ))
+    return -I_JT+(1/beta)*(gamma/2+2*np.pi**2*e**2*(kappa+dkappa/beta)-dmu*Q)
 
 def S_IR(Qin,m,q,beta,J):
     Q=Qin
-    e = _curly_E(Q,q)
-    betaJ = beta_times_curly_J(q,beta,e,J)
 
-    return _S_JT(Q,beta,q,J) + _S_0(Q,q,e) -m*2*np.log(2.0)/12.0
+    return _S_JT(Q,beta,q,J) + _S_0(Q,q,0) -m*2*np.log(2.0)/12.0
 
 def S_UV(Q,q):
 
@@ -166,10 +183,16 @@ def S_UV(Q,q):
 
 def S_gen(Q,m,q,beta,J):
 
+    if (Q>0.35):
+        return S_UV(Q,q)
+
     return np.min([S_UV(Q,q), S_IR(Q,m,q,beta,J)])
 
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
+
+    plt.rcParams['text.usetex'] = True
+    plt.rcParams['font.size'] = 15  
 
     Qx = np.linspace(0,0.35,100)
     plt.plot(Qx, [cSYK_termodynamics.kappa_inv(Q,30) for Q in Qx],label="numerical")
@@ -186,21 +209,36 @@ if __name__ == '__main__':
     mu_theory = mu_largeq(30,Qx,4)
     plt.plot(Qx,mu_theory,label="large $q$")
     plt.ylabel("$\\mu$")
+    plt.title("$\\beta=30$")
+    plt.xlabel("$\\mathcal{Q}$")
     plt.legend()
     plt.savefig('mu_beta=30.pdf',dpi=1000)
     plt.show()
 
-    Qx = np.linspace(0,0.49,100)
-    S_0 = np.array([_S_0(Qx[i],4,1) for i in range(len(Qx))])
-    S_JT = np.array([_S_JT(Qx[i],30,4,1) for i in range(len(Qx))])
-    S_large_q = np.array([_S_Gauge(Qx[i],4,30,_curly_E(Qx[i],4)) + _S_Gravity(Qx[i],4,30,_curly_E(Qx[i],4)) for i in range(len(Qx))])
-    S_UV = [S_UV(Qx[i],4)for i in range(len(Qx))]
+    plt.plot(Qx, [cSYK_termodynamics.gamma(Q,30) for Q in Qx],label="numerical")
+    gamma_theory = gamma_largeq(30,Qx,4)
+    plt.plot(Qx,gamma_theory,label="large $q$")
+    plt.ylabel("$\\gamma$")
+    plt.title("$\\beta=30$")
+    plt.xlabel("$\\mathcal{Q}$")
+    plt.legend()
+    plt.savefig('gamma_beta=30.pdf',dpi=1000)
+    plt.show()
 
-    plt.plot(Qx,S_JT, label="JT from I*",color="slategrey")
-    plt.plot(Qx,S_0, label="S0",color="cornflowerblue")
-    plt.plot(Qx,S_large_q,label="large q JT",color="navy")
-    plt.plot(Qx,S_UV,label="UV",color="lightseagreen")
-    plt.plot(Qx,np.zeros(len(Qx)),label="0",color="red")
+    Qy = np.linspace(0,0.5,100)
+
+    S_0 = np.array([_S_0(Q,4,1) for Q in Qy])
+    S_JT = np.array([_S_JT(Q,30,4,1) for Q in Qx])
+    S_IR = np.array([_S_JT(Q,30,4,1)+ _S_0(Q,4,1) for Q in Qx])
+    S_UV = [S_UV(Q,4)for Q in Qy]
+
+    plt.plot(Qx,S_JT, label="$S_\mathrm{IR}-S_0$",color="slategrey")
+    plt.plot(Qx,S_IR, label="$S_\mathrm{IR}$",color="forestgreen")
+    plt.plot(Qy,S_0, label="$S_0$",color="cornflowerblue")
+    plt.plot(Qy,S_UV,label="$S_\mathrm{UV}$",color="lightseagreen")
+    plt.ylabel("$S$")
+    plt.xlabel("$\\mathcal{Q}$")
+    plt.ylim(0,0.6)
     plt.legend()
     plt.show()
     
