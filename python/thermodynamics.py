@@ -154,6 +154,8 @@ def processData(N_Q,N_beta,q):
 
     plt.rcParams['text.usetex'] = True
     plt.rcParams['font.size'] = 15
+    plt.rcParams.update({'figure.autolayout': True})
+    plt.tight_layout()
 
     i=0
     for OmegaVec in Omegas:
@@ -199,7 +201,7 @@ def processData(N_Q,N_beta,q):
         plt.plot(Qs[i],derivative(Qs[i]),label="$T=" + str(Ts[i,0])+"$")
         i+=1
     plt.xlabel("$\\mathcal{Q}$")
-    plt.ylabel("$\\kappa^{-1}$")
+    plt.ylabel("$K^{-1}$")
     plt.savefig('kappa_inv_1.pdf',dpi=1000)
     plt.show()
 
@@ -254,7 +256,7 @@ def processData(N_Q,N_beta,q):
         plt.plot(Qs[i],derivative(Qs[i]),label="$T=" + str(Ts[i,0])+"$")
         i+=1
     plt.xlabel("$\\mathcal{Q}$")
-    plt.ylabel("$\\kappa^{-1}$")
+    plt.ylabel("$K^{-1}$")
     plt.savefig('kappa_inv_2.pdf',dpi=1000)
     plt.show()
     
@@ -265,7 +267,7 @@ def processData(N_Q,N_beta,q):
     plt.plot(Qs[i],kappa_inv_theory,label="large $q$")
     plt.title("$T=" + str(Ts[i,0])+"$")
     plt.xlabel("$\\mathcal{Q}$")
-    plt.ylabel("$\\kappa^{-1}$")
+    plt.ylabel("$K^{-1}$")
     plt.legend()
     plt.savefig('kappa_inv_'+str(betas[i,0])+'=30.pdf',dpi=1000)
     plt.show()
@@ -289,7 +291,7 @@ def processData(N_Q,N_beta,q):
         kappa_inv[i] = pol
         plt.scatter(Ts[:,0],kappa_inv_coef[:,i],label="c"+str(i))
         plt.plot(Ts[:,0],polynomial.Polynomial(pol)(Ts[:,0]))
-    plt.title("$\\kappa^{-1}$ coefficients")
+    plt.title("$K^{-1}$ coefficients")
     plt.legend()
     plt.xlabel("$T$")
     plt.savefig('kappa_inv_coef.pdf',dpi=1000)

@@ -6,6 +6,7 @@ import physics
 import JT_entropy
 
 plt.rcParams['text.usetex'] = True
+plt.rcParams['font.size'] = 15
 
 files = ['beta=2.0q=4N=400_data', 'beta=5.0q=4N=400_data', 
          'beta=10.0q=4N=400_data', 'beta=20.0q=4N=400_data', 

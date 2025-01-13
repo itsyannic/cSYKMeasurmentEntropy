@@ -178,8 +178,10 @@ def S_IR(Qin,m,q,beta,J):
 def S_UV(Q,q):
 
     k = 1-2*Q
+    j = Q+0.5
 
-    return k*(np.log(2)-(1/q**2)*( np.arcsin(k**(3/2)) )**2 )
+    #return k*(np.log(2)-(1/q**2)*( np.arcsin(k**(3/2)) )**2 )
+    return -np.log(j**2+(1-j)**2)
 
 def S_gen(Q,m,q,beta,J):
 
