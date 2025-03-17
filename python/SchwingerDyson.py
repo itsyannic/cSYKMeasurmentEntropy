@@ -3,7 +3,7 @@ import fields
 
 class SchwingerDyson:
 
-    def __init__(self, beta, q, J, m, discretization, error_threshold, weight=0.05, max_iter=1000, silent=False):
+    def __init__(self, beta, q, J, m, discretization, error_threshold, weight=0.05, max_iter=1000, mu=0, silent=False):
 
         self.q = np.double(q)
         self._beta = np.double(beta)
@@ -13,6 +13,15 @@ class SchwingerDyson:
         self.discretization = discretization
         self.max_iter = max_iter
         self.silent = silent
+
+        self.error_threshold = np.double(error_threshold)
+        self.initial_weight = np.double(weight)
+        self.normalization = np.power(self._beta/self.discretization,2)
+        self.iter_count = 0
+        self.didconverge = [False,False]
+
+        self._mu = np.double(mu)
+        self._muMatrix = np.full((2*discretization, 2*discretization),mu,dtype=np.double)
 
         self.G33n = np.zeros((2*discretization, 2*discretization), dtype=np.double)
         self.G33d = np.zeros((2*discretization, 2*discretization), dtype=np.double)
@@ -29,11 +38,7 @@ class SchwingerDyson:
         self.Sigma33n = np.zeros((2*discretization, 2*discretization), dtype=np.double)
         self.Sigma33d = np.zeros((2*discretization, 2*discretization), dtype=np.double)
 
-        self.error_threshold = np.double(error_threshold)
-        self.initial_weight = np.double(weight)
-        self.normalization = np.power(self._beta/self.discretization,2)
-        self.iter_count = 0
-        self.didconverge = [False,False]
+        self._muhat = np.zeros((4*discretization, 4*discretization), dtype=np.double)
 
         self.init_matrices()
 
@@ -59,15 +64,39 @@ class SchwingerDyson:
         self._beta = input
         self.normalization = np.power(self._beta/self.discretization,2)
 
+    @property
+    def mu(self):
+        return self._mu
+    
+    @mu.setter
+    def mu(self, input):
+
+        self._mu = input
+        self._muMatrix = np.full((2*self.discretization, 2*self.discretization),input,dtype=np.double)
+        mu_dict = {'G11': -self._muMatrix*2, 'G22': self._muMatrix*2, 'G12': self._muMatrix*2, 'G21': -self._muMatrix*2}
+        self._muhat = fields.create_Sigma_hat(mu_dict,int(self.discretization/2))
+
+    def modified_sign(self, tau):
+
+        if (tau < 0):
+            return np.exp(self._mu*tau, dtype=np.double)/(np.exp(-self._mu*tau, dtype=np.double)+1)
+        elif (tau > 0):
+            return -np.exp(self._mu*tau, dtype=np.double)/(np.exp(self._mu*tau, dtype=np.double)+1)
+        else:
+            return 0
 
     def init_matrices(self):
 
+        
+        mu_dict = {'G11': -self._muMatrix*2, 'G22': self._muMatrix*2, 'G12': self._muMatrix*2, 'G21': -self._muMatrix*2}
+        self._muhat = fields.create_Sigma_hat(mu_dict,int(self.discretization/2))
+
         for i in range(2*self.discretization):
             for j in range(2*self.discretization):
-                self.G33n[i,j] = 0.5*np.sign(i-j, dtype=np.double)
+                self.G33n[i,j] = self.modified_sign(i-j)
 
                 if ((i<self.discretization and j<self.discretization) or (i >= self.discretization and j>=self.discretization )):
-                    self.G33d[i,j] = 0.5*np.sign(i-j, dtype=np.double)
+                    self.G33d[i,j] = self.modified_sign(i-j)
                 else:
                     self.G33d[i,j] = 0
 
@@ -75,12 +104,12 @@ class SchwingerDyson:
             for j in range(4*self.discretization):
 
                 if ( ((self.discretization<=i<3*self.discretization) and (self.discretization<=j<3*self.discretization)) or (( i< self.discretization or 3*self.discretization<=i<4*self.discretization) and ( j < self.discretization or 3*self.discretization<=j<4*self.discretization))):
-                    self.Ghatn[i,j] = 0.5*np.sign(i-j, dtype=np.double)
+                    self.Ghatn[i,j] = self.modified_sign(i-j)
                 else:
                     self.Ghatn[i,j] = 0
 
                 if ((i<2*self.discretization and j<2*self.discretization) or (i >= 2*self.discretization and j>=2*self.discretization )):
-                    self.Ghatd[i,j] = 0.5*np.sign(i-j, dtype=np.double)
+                    self.Ghatd[i,j] = self.modified_sign(i-j)
                 else:
                     self.Ghatd[i,j] = 0
 
@@ -109,8 +138,8 @@ class SchwingerDyson:
 
     def __get_G(self, Sigma33, Sigmahat, G33free_inv, Ghatfree_inv):
 
-        Ghat = np.linalg.inv(Ghatfree_inv.astype(np.double) - Sigmahat.astype(np.double))
-        G33 = np.linalg.inv(G33free_inv.astype(np.double) - Sigma33.astype(np.double))
+        Ghat = np.linalg.inv(Ghatfree_inv.astype(np.double) - Sigmahat.astype(np.double) - self.normalization*self._muhat.astype(np.double))
+        G33 = np.linalg.inv(G33free_inv.astype(np.double) - Sigma33.astype(np.double) - self.normalization*self._muMatrix.astype(np.double))
 
         return G33, Ghat
     
