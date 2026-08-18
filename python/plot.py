@@ -61,7 +61,7 @@ plt.ylabel('$S$')
 plt.xlim(0,0.5)
 plt.ylim(0,0.6)
 plt.legend()
-plt.title('Reny-2 Entropy for $q=4$')
+plt.title('Renyi-2 Entropy for $q=4$')
 plt.savefig('entropyvsQ.pdf', dpi=1000)
 plt.show()
 
